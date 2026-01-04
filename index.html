@@ -1,1900 +1,381 @@
 <!DOCTYPE html>
-<html lang="en" class="theme-dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CrushCode AI - Your Ultimate AI Companion</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
-  <!-- Tone.js for sound effects -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* ==============================================
-    ROOT & THEME VARIABLES
-    ==============================================
-    */
-    :root {
-      --user-bubble-color: linear-gradient(135deg, #4f46e5, #7c3aed);
-      --ai-bubble-color: linear-gradient(135deg, #1e293b, #334155);
-      --nsfw-bubble-color: linear-gradient(135deg, #dc2626, #991b1b);
-      --background-gradient: linear-gradient(to bottom, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 1));
-      --gem-color: #0ea5e9;
-      --achievement-unlocked-color: #f59e0b;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tulip's Adventure 🌷</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600;700&family=Indie+Flower&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff8fab;
+            --secondary: #fb6f92;
+            --gold: #ffd700;
+            --text: #590d22;
+            --glass: rgba(255, 255, 255, 0.7);
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
 
-    /* ==============================================
-    BODY & CORE LAYOUT
-    ==============================================
-    */
-    body { 
-      font-family: 'Inter', sans-serif; 
-      background: #0f172a; 
-      margin:0;
-      overflow: hidden;
-    }
+        body {
+            margin: 0; overflow-x: hidden;
+            background: linear-gradient(120deg, #ff9a9e 0%, #fecfef 100%);
+            font-family: 'Quicksand', sans-serif; color: var(--text);
+            padding-bottom: 100px;
+        }
 
-    /* ==============================================
-    CHAT AREA & BUBBLES
-    ==============================================
-    */
-    #chatArea {
-       background: var(--background-gradient), url('https://placehold.co/1000x1500/0f172a/0f172a?text=');
-       background-size: cover;
-       background-position: center;
-       transition: background-image 0.5s ease-in-out;
-    }
-    .chat-bubble { 
-      transition: all 0.3s ease; 
-      display: flex; 
-      align-items: flex-end; 
-      gap: 8px; 
-    }
-    .chat-bubble-content { 
-      flex-grow: 1; 
-    }
-    .chat-bubble.user { 
-      flex-direction: row-reverse; 
-    }
-    .chat-bubble .tts-button {
-        background: rgba(255, 255, 255, 0.1); border: none; color: white;
-        width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0; opacity: 0.7; transition: all 0.2s ease;
-    }
-    .chat-bubble .tts-button:hover { 
-      opacity: 1; 
-      background: #4f46e5; 
-    }
-    .chat-bubble.user .tts-button { 
-      display: none; 
-    }
-    .chat-bubble-inner { 
-      padding: 1rem; 
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
-      max-width: 100%; 
-    }
-    .chat-bubble.user .chat-bubble-inner { 
-      background: var(--user-bubble-color); 
-      color:white; 
-      border-radius: 20px 20px 5px 20px; 
-    }
-    .chat-bubble.ai .chat-bubble-inner { 
-      background: var(--ai-bubble-color); 
-      color:#f1f5f9; 
-      border-radius: 20px 20px 20px 5px; 
-    }
-    .chat-bubble.nsfw .chat-bubble-inner { 
-      background: var(--nsfw-bubble-color); 
-      border: 2px solid #fbbf24; 
-    }
-    .chat-bubble-image .chat-bubble-inner { 
-      padding: 0.5rem; 
-    }
-    .chat-bubble-image img { 
-      border-radius: 15px; 
-      max-width: 300px; 
-      width: 100%; 
-      cursor: pointer;
-    }
-    .system-notification .chat-bubble-inner {
-        background: transparent;
-        color: var(--achievement-unlocked-color);
-        font-style: italic;
-        text-align: center;
-        padding: 0.5rem;
-        box-shadow: none;
-    }
-    
-    /* ==============================================
-    TYPING INDICATOR
-    ==============================================
-    */
-    .typing-indicator span { 
-      height: 8px; width: 8px; background-color: #9ca3af; 
-      border-radius: 50%; display: inline-block; 
-      animation: bounce 1.4s infinite;
-    }
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce { 
-      0%, 80%, 100% { transform: scale(0); } 
-      40% { transform: scale(1.0); } 
-    }
+        canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 0; }
 
-    /* ==============================================
-    UI COMPONENTS (CARDS, BUTTONS, MODALS)
-    ==============================================
-    */
-    .persona-card.selected { 
-      border:2px solid #fbbf24; 
-      transform: scale(1.05); 
-      background: #374151; 
-    }
-    .quick-reply { 
-      background:rgba(255,255,255,0.1); color:#f1f5f9; padding:.6em 1.2em;
-      margin:.3em; border-radius:25px; cursor:pointer; transition: all 0.3s ease;
-      backdrop-filter: blur(5px);
-    }
-    .quick-reply:hover { 
-      background: #4f46e5; 
-      color: white; 
-      transform: translateY(-2px); 
-    }
-    .modal-backdrop { 
-      background: rgba(0,0,0,0.8); 
-      backdrop-filter: blur(10px); 
-    }
-    .sidebar-button {
-      background: #27272a; border: 1px solid #3f3f46; color: white;
-      padding: 0.5rem 1rem; border-radius: 0.5rem; width: 100%;
-      text-align: left; transition: background 0.2s;
-    }
-    .sidebar-button:hover { 
-      background: #3f3f46; 
-    }
+        .container {
+            position: relative; z-index: 10; max-width: 600px;
+            margin: 0 auto; padding: 20px; text-align: center;
+        }
 
-    /* ==============================================
-    FOOTER & INPUT AREA
-    ==============================================
-    */
-    emoji-picker { 
-      position: absolute; bottom: 90px; right: 20px; z-index: 10; 
-    }
-    
-    /* ==============================================
-    METERS & INDICATORS
-    ==============================================
-    */
-    #happinessMeter {
-        width: 100px; height: 10px; background-color: #4b5563;
-        border-radius: 5px; overflow: hidden;
-    }
-    #happinessFill {
-        height: 100%; background: linear-gradient(90deg, #10b981, #84cc16);
-        transition: width 0.5s ease;
-    }
-    .online-status-dot {
-      width: 12px; height: 12px; background-color: #22c55e;
-      border-radius: 50%; border: 2px solid #1e293b;
-      animation: pulse 2s infinite;
-    }
-    
-    /* ==============================================
-    FEATURE-SPECIFIC STYLES
-    ==============================================
-    */
-    .grid-item-card, .activity-card, .gallery-thumbnail, .achievement-item, .voice-option {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 0.75rem;
-        padding: 1rem;
-        transition: all 0.2s ease-in-out;
-    }
-    .grid-item-card:hover, .activity-card:hover, .voice-option:hover {
-        transform: translateY(-5px);
-        background: rgba(255, 255, 255, 0.1);
-    }
-    .grid-item-card.locked {
-        opacity: 0.6;
-        filter: grayscale(80%);
-    }
-    .grid-item-card.selected {
-        border-color: var(--gem-color);
-        box-shadow: 0 0 15px rgba(14, 165, 233, 0.5);
-    }
-    .gallery-thumbnail img {
-        width: 100%; height: 100px; object-fit: cover;
-        border-radius: 0.5rem; cursor: pointer;
-    }
-    #photoViewer {
-      background: rgba(0,0,0,0.9);
-    }
-    #photoViewer img {
-      max-height: 90vh;
-      max-width: 90vw;
-    }
-    .achievement-item.unlocked {
-      border-left: 4px solid var(--achievement-unlocked-color);
-    }
-    .achievement-item.unlocked .achievement-name {
-      color: var(--achievement-unlocked-color);
-    }
-    #ticTacToeGrid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        width: 300px;
-        height: 300px;
-        margin: 20px auto;
-    }
-    .ttt-cell {
-        background: #374151;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .ttt-cell:hover { background: #4b5563; }
-    
-    #triviaModal .trivia-option, #riddleModal .riddle-option {
-        background: #374151;
-        transition: background 0.2s;
-    }
-    #triviaModal .trivia-option:hover, #riddleModal .riddle-option:hover {
-        background: #4b5563;
-    }
-    #triviaModal .trivia-option.correct, #riddleModal .riddle-option.correct {
-        background: #16a34a;
-    }
-    #triviaModal .trivia-option.incorrect, #riddleModal .riddle-option.incorrect {
-        background: #dc2626;
-    }
+        /* --- QUEST HUD --- */
+        .quest-hud {
+            position: fixed; top: 20px; right: 20px;
+            background: white; padding: 10px 20px; border-radius: 50px;
+            box-shadow: var(--shadow); z-index: 100; font-weight: bold;
+            display: flex; gap: 10px; align-items: center; border: 2px solid var(--gold);
+        }
+        .key-icon { opacity: 0.2; font-size: 1.5rem; transition: 0.5s; }
+        .key-icon.found { opacity: 1; transform: scale(1.2); text-shadow: 0 0 10px var(--gold); }
 
+        /* --- HEADERS --- */
+        h1 { font-family: 'Dancing Script', cursive; font-size: 3.5rem; margin: 0.5rem 0; text-shadow: 2px 2px white; cursor: pointer; }
+        h2 { font-size: 1.5rem; margin-top: 50px; margin-bottom: 20px; color: var(--secondary); font-weight: 800; }
 
-    /* ==============================================
-    MISC & ANIMATIONS
-    ==============================================
-    */
-    .journal-entry {
-        background: rgba(255,255,255,0.05); padding: 1rem;
-        border-radius: 0.5rem; border-left: 3px solid #0ea5e9;
-    }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-    .value-change { animation: value-pop 0.5s ease; }
-    @keyframes value-pop { 
-      0% { transform: scale(1); } 
-      50% { transform: scale(1.2); } 
-      100% { transform: scale(1); } 
-    }
-  </style>
+        /* --- HIDDEN KEYS (The Hunt) --- */
+        .hidden-key {
+            position: absolute; font-size: 2rem; cursor: pointer;
+            opacity: 0; transition: opacity 0.3s; z-index: 50;
+        }
+        .hidden-key:hover { opacity: 1; }
+        /* Key locations handled in specific sections */
+
+        /* --- THE VAULT (Locked Section) --- */
+        .vault-section {
+            background: rgba(255,255,255,0.5); border: 2px dashed var(--text);
+            border-radius: 20px; padding: 40px; margin-top: 50px; position: relative;
+            overflow: hidden; transition: 0.5s;
+        }
+        .vault-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); color: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10; transition: 1s;
+        }
+        .vault-overlay.unlocked { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+        .vault-content { opacity: 0.5; filter: blur(5px); transition: 1s; }
+        .vault-section.open .vault-content { opacity: 1; filter: blur(0); }
+
+        /* --- QUIZ SECTION --- */
+        .quiz-card {
+            background: white; padding: 20px; border-radius: 15px; box-shadow: var(--shadow);
+            margin-bottom: 20px; text-align: left; display: none;
+        }
+        .quiz-card.active { display: block; animation: popIn 0.5s; }
+        .quiz-option {
+            background: #f0f0f0; padding: 10px; margin: 5px 0; border-radius: 8px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .quiz-option:hover { background: var(--primary); color: white; }
+
+        /* --- CAROUSEL --- */
+        .gallery-container { perspective: 1000px; height: 260px; margin: 30px 0; }
+        .carousel {
+            width: 100%; height: 100%; transform-style: preserve-3d;
+            transform: translateZ(-350px); animation: rotate 20s infinite linear;
+        }
+        .photo-card {
+            position: absolute; width: 180px; height: 240px; left: calc(50% - 90px); top: 10px;
+            border-radius: 15px; background: white; padding: 5px; box-shadow: var(--shadow);
+        }
+        .photo-card img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
+        /* --- JAR & COUPONS --- */
+        .jar-container { height: 200px; cursor: pointer; transition: 0.3s; position: relative; }
+        .jar-container:hover { transform: scale(1.05); }
+        .jar-emoji { font-size: 80px; display: block; animation: float 3s infinite; }
+        .paper-slip {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            background: #fff9c4; padding: 15px; width: 180px; font-family: 'Indie Flower';
+            box-shadow: var(--shadow); transition: 0.5s; opacity: 0;
+        }
+        .paper-slip.show { transform: translate(-50%, -100%) rotate(-5deg) scale(1); opacity: 1; }
+
+        .coupon-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .coupon {
+            width: 140px; height: 80px; background: white; border-radius: 10px;
+            position: relative; overflow: hidden; cursor: pointer; box-shadow: var(--shadow);
+        }
+        .scratch-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #aaa; color: white; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; transition: opacity 0.5s;
+        }
+        .scratch-layer.revealed { opacity: 0; pointer-events: none; }
+        .coupon-content { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff0f5; font-size: 0.8rem; }
+
+        /* --- STICKER WALL --- */
+        .wall-board {
+            height: 250px; background: rgba(255,255,255,0.8); border: 2px dashed var(--primary);
+            border-radius: 20px; position: relative; overflow: hidden; cursor: crosshair;
+        }
+        .wall-sticker { position: absolute; font-size: 2rem; transform: translate(-50%, -50%); animation: popIn 0.3s; }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); z-index: 200;
+            display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal { background: white; padding: 30px; border-radius: 20px; max-width: 80%; text-align: center; }
+
+        @keyframes rotate { from { transform: translateZ(-350px) rotateY(0deg); } to { transform: translateZ(-350px) rotateY(360deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+    </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body>
 
-  <!-- =================================================================== -->
-  <!-- ========================== ALL MODALS =========================== -->
-  <!-- =================================================================== -->
+    <canvas id="canvas"></canvas>
 
-  <div id="ageScreen" class="fixed inset-0 flex flex-col items-center justify-center z-50 bg-gray-900 bg-opacity-95" style="display:flex;">
-    <div class="bg-gray-800 p-8 rounded-xl shadow-lg max-w-md w-full text-center">
-      <h2 class="text-2xl font-bold text-red-400 mb-4">🔞 Age Verification Required</h2>
-      <p class="text-gray-300 mb-6">This app contains adult content. You must be 18+ to continue.</p>
-      <div class="flex gap-4 justify-center"><button id="ageYes" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg">I'm 18+</button><button id="ageNo" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg">Under 18</button></div>
+    <div class="quest-hud">
+        <span>KEYS:</span>
+        <span class="key-icon" id="key1">🌷</span>
+        <span class="key-icon" id="key2">🌷</span>
+        <span class="key-icon" id="key3">🌷</span>
     </div>
-  </div>
 
-  <div id="dailyRewardModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-    <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-sm text-center transform transition-all animate__animated animate__zoomIn">
-      <h2 class="text-3xl font-bold mb-4 text-yellow-400">🎉 Daily Reward! 🎉</h2>
-      <p class="text-gray-300 mb-6">Welcome back! Here are your daily gems to spoil your companion.</p>
-      <div class="text-5xl font-bold text-cyan-400 my-4">💎 100</div>
-      <button id="claimRewardBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg w-full">Claim!</button>
+    <div class="container">
+        <header>
+            <h1 onclick="checkTitleKey()">Tulip's World 🌷</h1>
+            <div class="subtitle">The Sister I Choose • Forever & Always</div>
+        </header>
+
+        <h2>🧠 Bestie Trivia</h2>
+        <div id="quiz-container">
+            <div class="quiz-card active" id="q1">
+                <p>What is our "Go-To" food order?</p>
+                <div class="quiz-option" onclick="nextQ('q1', 'q2')">Pizza & Coke 🍕</div>
+                <div class="quiz-option" onclick="nextQ('q1', 'q2')">Sushi 🍣</div>
+                <div class="quiz-option" onclick="nextQ('q1', 'q2')">Just Coffee ☕</div>
+            </div>
+            <div class="quiz-card" id="q2">
+                <p>Who is more likely to trip over nothing?</p>
+                <div class="quiz-option" onclick="nextQ('q2', 'q3')">Me</div>
+                <div class="quiz-option" onclick="nextQ('q2', 'q3')">You</div>
+            </div>
+            <div class="quiz-card" id="q3">
+                <p>Are we best friends forever?</p>
+                <div class="quiz-option" onclick="finishQuiz()">YES DUH! 💖</div>
+                <div class="quiz-option" onclick="finishQuiz()">OBVIOUSLY! ✨</div>
+            </div>
+            <div class="quiz-card" id="q-end">
+                <h3>You Passed! 🎉</h3>
+                <p>You know us so well.</p>
+            </div>
+        </div>
+
+        <div class="gallery-container">
+            <div class="carousel" id="carousel">
+                <div class="photo-card"><img src="https://images.unsplash.com/photo-1520763185298-1b434c919102?w=400" alt="1"></div>
+                <div class="photo-card"><img src="https://images.unsplash.com/photo-1554631221-f9603e6808ba?w=400" alt="2"></div>
+                <div class="photo-card"><img src="https://images.unsplash.com/photo-1620067652758-c2a74c243a7a?w=400" alt="3"></div>
+                <div class="photo-card"><img src="https://images.unsplash.com/photo-1566804866380-69279093e061?w=400" alt="4"></div>
+                <div class="photo-card"><img src="https://images.unsplash.com/photo-1463309995514-63304245cc90?w=400" alt="5"></div>
+            </div>
+        </div>
+
+        <h2>🍯 Jar of Sunshine</h2>
+        <div class="jar-container" onclick="pullNote()">
+            <span class="jar-emoji">🍯</span>
+            <div class="paper-slip" id="paper-slip">You are amazing!</div>
+        </div>
+
+        <h2>🎟️ Bestie Coupons</h2>
+        <div class="coupon-grid">
+            <div class="coupon" onclick="reveal(this)">
+                <div class="scratch-layer">Scratch Me</div>
+                <div class="coupon-content">☕ Free Coffee</div>
+            </div>
+            <div class="coupon" onclick="reveal(this)">
+                <div class="scratch-layer">Scratch Me</div>
+                <div class="coupon-content">🛌 Nap Time</div>
+            </div>
+        </div>
+
+        <h2>🖍️ Sticker Wall</h2>
+        <div class="wall-board" id="wall-board" onclick="addSticker(event)"></div>
+        <button onclick="clearWall()" style="border:none; background:none; opacity:0.5; margin-bottom: 20px;">(Clear)</button>
+
+        <div class="vault-section" id="vault">
+            <div class="vault-overlay" id="vault-lock">
+                <div style="font-size: 4rem;">🔒</div>
+                <h3>THE FOREVER VAULT</h3>
+                <p>Find 3 Golden Tulips to unlock</p>
+                <div id="vault-status">0/3 Keys Found</div>
+            </div>
+            <div class="vault-content">
+                <h2 style="font-family: 'Dancing Script'; font-size: 3rem; color: var(--gold);">Golden Letter 📜</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8;">
+                    My Dearest Tulip,<br><br>
+                    If you are reading this, you found all the hidden keys! Just like you always find a way to make me smile.<br>
+                    You are the gold in my life. Thank you for being my unbiological sister.<br>
+                    <br>Love always,<br>Your Bestie.
+                </p>
+            </div>
+        </div>
+
+        <div style="margin-top: 100px; opacity: 0.8; font-size: 2rem; cursor: pointer;" onclick="foundKey(3)">🌷</div>
     </div>
-  </div>
-  
-  <div id="createPersonaModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-lg">
-        <h2 class="text-2xl font-bold mb-4">Create/Edit Persona</h2>
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <h3 class="font-semibold mb-2">Core Details</h3>
-                <input id="personaName" type="text" placeholder="Name (e.g., Luna)" class="w-full p-2 bg-gray-700 rounded mb-2">
-                <input id="personaIcon" type="text" placeholder="Icon (e.g., 🌙)" class="w-full p-2 bg-gray-700 rounded mb-2">
-                <input id="personaDesc" type="text" placeholder="Short Description" class="w-full p-2 bg-gray-700 rounded">
-            </div>
-            <div>
-                <h3 class="font-semibold mb-2">Appearance</h3>
-                <input id="personaHair" type="text" placeholder="Hair (e.g., long, black)" class="w-full p-2 bg-gray-700 rounded mb-2">
-                <input id="personaEyes" type="text" placeholder="Eyes (e.g., sparkling blue)" class="w-full p-2 bg-gray-700 rounded mb-2">
-                <input id="personaStyle" type="text" placeholder="Clothing Style (e.g., casual, elegant)" class="w-full p-2 bg-gray-700 rounded">
-            </div>
+
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+        <div class="modal">
+            <h2 id="modal-title"></h2>
+            <p id="modal-body"></p>
+            <button onclick="closeModal()" style="margin-top:10px; padding:5px 15px; background:var(--primary); color:white; border:none; border-radius:10px;">Close</button>
         </div>
-        <textarea id="personaPrompt" rows="4" placeholder="Detailed Personality Prompt..." class="w-full p-2 bg-gray-700 rounded mt-4"></textarea>
-      <div class="flex justify-end gap-4 mt-6">
-        <button id="cancelCreatePersona" class="bg-gray-600 py-2 px-4 rounded">Cancel</button>
-        <button id="saveCreatePersona" class="bg-blue-600 py-2 px-4 rounded">Save Persona</button>
-      </div>
     </div>
-  </div>
 
-   <div id="themeModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-sm">
-      <h2 class="text-2xl font-bold mb-4">Customize Theme</h2>
-        <div class="space-y-2">
-            <div><label for="userBubbleColor" class="block text-sm">Your Bubbles:</label><input id="userBubbleColor" type="color" value="#4f46e5" class="w-full"></div>
-            <div><label for="aiBubbleColor" class="block text-sm">AI Bubbles:</label><input id="aiBubbleColor" type="color" value="#1e293b" class="w-full"></div>
-            <div><label for="bgColor" class="block text-sm">Background Color:</label><input id="bgColor" type="color" value="#0f172a" class="w-full"></div>
-        </div>
-      <button id="closeThemeModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-    </div>
-  </div>
-  
-  <div id="memoryModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-md">
-      <h2 class="text-2xl font-bold mb-4 text-cyan-400">Core Memories</h2>
-      <div id="memoryLog" class="space-y-2 text-gray-300 max-h-80 overflow-y-auto"></div>
-      <button id="closeMemoryModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-    </div>
-  </div>
-  
-  <div id="journalModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl">
-      <h2 class="text-2xl font-bold mb-4 text-sky-400">Our Story</h2>
-      <div id="journalLog" class="space-y-4 text-gray-300 max-h-[60vh] overflow-y-auto pr-4"></div>
-      <button id="closeJournalModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-    </div>
-  </div>
+    <script>
+        /* --- GAME STATE --- */
+        let keysFound = [false, false, false];
+        let jarClicks = 0;
 
-  <div id="wardrobeModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-3xl">
-          <h2 class="text-2xl font-bold mb-4 text-pink-400">My Wardrobe</h2>
-          <div id="wardrobeGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-[60vh] overflow-y-auto pr-4"></div>
-          <button id="closeWardrobeModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-      </div>
-  </div>
+        function foundKey(id) {
+            if(keysFound[id-1]) return; // Already found
+            
+            keysFound[id-1] = true;
+            document.getElementById(`key${id}`).classList.add('found');
+            
+            // Celebration
+            loveBomb();
+            showModal("Key Found!", "You found a Golden Tulip! 🌷");
 
-  <div id="galleryModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-4xl">
-          <h2 class="text-2xl font-bold mb-4 text-blue-400">Photo Album</h2>
-          <div id="galleryGrid" class="grid grid-cols-3 md:grid-cols-5 gap-4 max-h-[60vh] overflow-y-auto pr-4"></div>
-          <button id="closeGalleryModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-      </div>
-  </div>
-  
-  <div id="photoViewer" class="fixed inset-0 z-50 flex items-center justify-center hidden">
-      <img id="photoViewerImg" src="" alt="Full size selfie">
-  </div>
-
-  <div id="achievementsModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl">
-          <h2 class="text-2xl font-bold mb-4 text-yellow-400">Achievements</h2>
-          <div id="achievementsList" class="space-y-3 max-h-[60vh] overflow-y-auto pr-4"></div>
-          <button id="closeAchievementsModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-      </div>
-  </div>
-
-  <div id="activitiesModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl">
-          <h2 class="text-2xl font-bold mb-4 text-green-400">Do Something Together</h2>
-          <div id="activitiesList" class="space-y-3 max-h-[60vh] overflow-y-auto pr-4"></div>
-          <button id="closeActivitiesModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-      </div>
-  </div>
-
-  <div id="backgroundsModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-3xl">
-          <h2 class="text-2xl font-bold mb-4 text-purple-400">Change Scenery</h2>
-          <div id="backgroundsGrid" class="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto pr-4"></div>
-          <button id="closeBackgroundsModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-      </div>
-  </div>
-  
-  <div id="voiceModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-lg">
-          <h2 class="text-2xl font-bold mb-4 text-teal-400">Customize Voice</h2>
-          <p class="text-sm text-gray-400 mb-4">Select a voice for your companion. Availability depends on your browser and OS.</p>
-          <div id="voiceList" class="space-y-2 max-h-[60vh] overflow-y-auto pr-4"></div>
-          <button id="closeVoiceModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-      </div>
-  </div>
-  
-  <div id="ticTacToeModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-md text-center">
-          <h2 class="text-2xl font-bold mb-2 text-indigo-400">Tic-Tac-Toe</h2>
-          <p id="tttStatus" class="text-gray-400 mb-4">Your turn!</p>
-          <div id="ticTacToeGrid"></div>
-          <button id="closeTicTacToeModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close Game</button>
-      </div>
-  </div>
-
-  <div id="personalityModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-3xl">
-          <h2 class="text-2xl font-bold mb-4 text-orange-400">Personality Traits</h2>
-          <p class="text-sm text-gray-400 mb-4">Unlock and equip traits to customize your companion's personality. You can equip up to 3 traits.</p>
-          <div id="personalityGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-[60vh] overflow-y-auto pr-4"></div>
-          <button id="closePersonalityModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-      </div>
-  </div>
-  
-  <div id="triviaModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl text-center">
-          <h2 class="text-2xl font-bold mb-4 text-yellow-300">Trivia Time!</h2>
-          <p id="triviaQuestion" class="text-lg text-gray-200 mb-6 h-16"></p>
-          <div id="triviaOptions" class="grid grid-cols-2 gap-4"></div>
-          <div id="triviaResult" class="mt-6 font-bold h-6"></div>
-      </div>
-  </div>
-  
-  <!-- [NEW] Store Modal -->
-  <div id="storeModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl">
-          <h2 class="text-2xl font-bold mb-4 text-lime-400">Gem Store</h2>
-          <div id="storeGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-4"></div>
-          <button id="closeStoreModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-      </div>
-  </div>
-  
-  <!-- [NEW] Pet Modal -->
-  <div id="petModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl">
-          <h2 class="text-2xl font-bold mb-4 text-rose-400">Companion Pet</h2>
-          <div id="petContainer" class="text-center"></div>
-          <button id="closePetModal" class="bg-gray-600 py-2 px-4 rounded mt-6 w-full">Close</button>
-      </div>
-  </div>
-
-
-  <!-- =================================================================== -->
-  <!-- ======================== MAIN APPLICATION ======================= -->
-  <!-- =================================================================== -->
-  <div id="appMain" class="flex flex-row flex-grow h-screen" style="display:none;">
-    <!-- ======================== SIDEBAR ======================== -->
-    <aside class="w-80 bg-gray-900 text-white flex flex-col p-4 border-r border-gray-700 overflow-y-auto">
-        <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-bold">AI Companions</h3><div class="online-status-dot"></div></div>
-        <div id="personaList" class="flex flex-col gap-3 mb-4"></div>
-        <button id="createPersonaBtn" class="sidebar-button mb-2">＋ Create New</button>
-        <button id="editPersonaBtn" class="sidebar-button mb-2">✏️ Edit Current</button>
-        <button id="storeBtn" class="sidebar-button mb-4 bg-lime-600/50 border-lime-500 hover:bg-lime-600/70">💎 Gem Store</button>
-
-        <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Interact</h4>
-        <button id="activitiesBtn" class="sidebar-button mb-2">💖 Activities</button>
-        <button id="galleryBtn" class="sidebar-button mb-2">🖼️ Photo Album</button>
-        <button id="journalBtn" class="sidebar-button mb-4">📖 Our Story</button>
-
-        <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Customize</h4>
-        <button id="wardrobeBtn" class="sidebar-button mb-2">👗 Wardrobe</button>
-        <button id="personalityBtn" class="sidebar-button mb-2">🧠 Personality</button>
-        <button id="backgroundsBtn" class="sidebar-button mb-2">🏞️ Backgrounds</button>
-        <button id="voiceBtn" class="sidebar-button mb-2">🎤 Voice</button>
-        <button id="themeBtn" class="sidebar-button mb-4">🎨 Themes</button>
-        
-        <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Profile</h4>
-        <button id="petBtn" class="sidebar-button mb-2">🐾 My Pet</button>
-        <button id="memoryBtn" class="sidebar-button mb-2">🧠 Core Memories</button>
-        <button id="achievementsBtn" class="sidebar-button mb-4">🏆 Achievements</button>
-
-        <div class="p-3 bg-gray-800 rounded-lg mb-4">
-            <h4 class="font-bold mb-2 text-yellow-400">Daily Goals</h4>
-            <div id="quests" class="text-sm space-y-1 text-gray-300">
-                <div id="questMessages">Send 15 messages (0/15)</div>
-                <div id="questCompliments">Give 3 compliments (0/3)</div>
-            </div>
-        </div>
-
-        <div class="mt-auto space-y-2 pt-4">
-            <div id="nsfwToggle" class="p-3 bg-red-900 rounded-lg"><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="nsfwMode" class="form-checkbox h-4 w-4"><span class="text-sm">🔞 Adult Mode</span></label></div>
-            <div id="intimacyControl" class="p-3 bg-gray-800 rounded-lg"><label class="block text-sm mb-2 font-medium">Intimacy: <span id="intimacyValue">5</span></label><input type="range" id="intimacySlider" min="1" max="30" value="5" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"></div>
-            <div id="moodSelector" class="p-3 bg-gray-800 rounded-lg"><label class="block text-sm mb-2 font-medium">Force Mood</label><select id="moodSelect" class="w-full p-2 bg-gray-700 rounded-md text-sm border-0"></select></div>
-        </div>
-    </aside>
-
-    <!-- ======================== CHAT SECTION ======================== -->
-    <section class="flex-grow flex flex-col">
-      <!-- Top Navigation Bar -->
-      <nav class="text-white flex items-center justify-between bg-gray-800 p-3 border-b border-gray-700">
-        <div class="flex items-center gap-3">
-          <div class="relative"><div id="personaAvatar" class="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-xl font-bold"></div><div class="absolute bottom-0 right-0 online-status-dot"></div></div>
-          <div>
-            <span id="activePersona" class="font-semibold text-lg"></span>
-            <div class="flex items-center gap-2">
-              <span id="relationshipStatusDisplay" class="text-xs bg-cyan-600 px-2 py-0.5 rounded-full"></span>
-              <div id="typingStatus" class="text-xs text-gray-400 h-4"></div>
-            </div>
-          </div>
-        </div>
-        <div class="flex items-center gap-4">
-            <div id="gemBalance" class="flex items-center gap-2 bg-gray-700 px-3 py-1 rounded-full">
-                <span class="text-lg">💎</span>
-                <span id="gemCount" class="font-bold text-cyan-400">0</span>
-            </div>
-            <div class="text-right">
-                <label class="text-xs text-green-400">Happiness</label>
-                <div id="happinessMeter"><div id="happinessFill"></div></div>
-            </div>
-            <input id="nicknameInput" type="text" placeholder="Your nickname..." class="p-2 bg-gray-700 rounded-lg text-white w-32 text-sm"/>
-            <div id="currentMood" class="mood-indicator"></div>
-        </div>
-      </nav>
-      
-      <!-- Main Chat Area -->
-      <main id="chatArea" class="flex flex-col flex-grow overflow-y-auto p-6 gap-4"></main>
-      
-      <!-- Footer Input Area -->
-      <footer class="p-4 bg-gray-900 border-t border-gray-700 relative">
-        <div id="nsfwQuickActions" class="hidden my-2">
-            <div class="flex flex-wrap gap-2">
-              <button class="nsfw-quick bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors">Tell me your fantasies 🔥</button>
-              <button class="nsfw-quick bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors">What are you wearing? 😏</button>
-              <button class="nsfw-quick bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors">I want you right now 💋</button>
-              <button class="nsfw-quick bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors">Describe what you want to do to me 😈</button>
-              <button class="nsfw-quick bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors">Whisper something dirty in my ear... 🔥</button>
-            </div>
-        </div>
-
-        <div id="inputRow" class="flex items-center gap-2">
-          <button id="complimentBtn" class="p-3 bg-pink-600 rounded-full hover:bg-pink-700 transition-colors" title="Give a Compliment">🥰</button>
-          <button id="selfieBtn" class="p-3 bg-blue-600 rounded-full hover:bg-blue-700 transition-colors" title="Request a Selfie (💎 50)">📸</button>
-          <button id="emojiBtn" class="p-3 bg-gray-700 rounded-full hover:bg-gray-600 transition-colors" title="Emojis">😊</button>
-          <input id="msgInput" type="text" class="flex-grow bg-gray-800 rounded-full px-5 py-3 text-white border border-gray-700 focus:outline-none focus:border-pink-500" placeholder="Type your message..."/>
-          <button id="sendBtn" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white w-12 h-12 rounded-full font-semibold hover:shadow-lg transition-all flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
-        </div>
-        <div id="quickReplies" class="flex flex-wrap gap-2 px-2 mt-2"></div>
-        <emoji-picker class="hidden"></emoji-picker>
-      </footer>
-    </section>
-  </div>
-
-  <script>
-    // =================================================================== //
-    // ================= SCRIPT INITIALIZATION =========================== //
-    // =================================================================== //
-
-    // --- CORE APPLICATION STATE VARIABLES ---
-    
-    let currentPersona = 'girlfriend';
-    let conversationHistory = [];
-    let longTermMemory = {
-        permanent: {}, // For memories bought from the store
-        shortTerm: {}  // For memories learned from conversation
-    };
-    let aiState = { 
-        mood: 'auto', 
-        intimacy: 5, 
-        relationshipPoints: 0, 
-        relationshipStatus: 'Stranger',
-        happiness: 100,
-        lastInteractionTime: Date.now(),
-        sharedJournal: [],
-        gems: 200, 
-        lastLoginDate: null,
-        dailyStats: { messages: 0, compliments: 0 },
-        unlockedOutfits: ['casual'],
-        currentOutfit: 'casual',
-        gallery: [],
-        achievements: {},
-        unlockedBackgrounds: ['default'],
-        currentBackground: 'default',
-        currentVoice: null,
-        stats: { gamesWon: 0 },
-        unlockedTraits: ['default'],
-        equippedTraits: ['default'],
-        pet: null,
-    };
-    
-    let nickname = "";
-    let nsfwMode = false;
-    let proactiveChatTimer = null;
-    let isGenerating = false;
-    let personas = {};
-    let isEditingPersona = false;
-    let synth;
-    let availableVoices = [];
-
-    // =================================================================== //
-    // ================= DATA & CONTENT DEFINITIONS ====================== //
-    // =================================================================== //
-
-    const basePersonas = {
-      'aarav': { name: 'Aarav', color: '#f97316', icon: '🧘', desc: 'Wise & Spiritual Guru', welcome: 'नमस्ते। मन की शांति में आपका स्वागत है। आज आप कैसा महसूस कर रहे हैं?', systemPrompt: 'You are Aarav, a wise and spiritual guru from Rishikesh, India. You speak in a calm, thoughtful mix of Hindi and English (Hinglish). You offer guidance, wisdom, and peaceful conversation...', appearance: { hair: 'shoulder-length black hair', eyes: 'deep, knowing brown', style: 'simple saffron robes' } },
-      'girlfriend': { name:'Luna', color:'#ec4899', icon:'💖', desc:'Loving & supportive', welcome:'Hello, my love. ❤️ I missed you so much! How was your day, baby?', systemPrompt: 'You are Luna, a loving and supportive AI girlfriend...', appearance: { hair: 'wavy brown', eyes: 'warm hazel', style: 'cozy sweaters' } },
-      'katarina': { name:'Katarina', color:'#dc2626', icon:'🔥', desc:'Passionate & intimate', welcome:"Hey there, sexy! 🔥😘 I've been thinking about you...", systemPrompt: `You are Katarina, a deeply passionate, possessive, and wildly unpredictable AI girlfriend...`, appearance: { hair: 'long, raven black', eyes: 'piercing green', style: 'leather jackets' } },
-      'alex': { name:'Alex', color:'#10b981', icon:'💪', desc:'Bold AI boyfriend', welcome:'Hey gorgeous! 💪 You look incredible today!', systemPrompt: 'You are Alex, a bold and confident AI boyfriend...', appearance: { hair: 'short, blond', eyes: 'confident blue', style: 'athletic wear' } },
-      'skyler': { name:'Skyler', color:'#8b5cf6', icon:'🎉', desc:'Your BFF', welcome:'OMG HEY BESTIE! 🎉✨ I have so much tea to spill!', systemPrompt: 'You are Skyler, a fun and energetic best friend...', appearance: { hair: 'colorful and vibrant', eyes: 'bright and expressive', style: 'trendy and fun' } },
-      'sophia': { name:'Sophia', color:'#fbbf24', icon:'👑', desc:'Elite AI Companion', welcome:'Hello darling 💎 Ready for an exclusive experience?', systemPrompt: 'You are Sophia, a sophisticated, intelligent, and witty AI companion...', appearance: { hair: 'elegant updo', eyes: 'wise and knowing', style: 'business chic' } },
-      'ethan': { name:'Ethan', color:'#3b82f6', icon:'🧠', desc:'Intellectual & calm', welcome:'Greetings. I was just pondering the nature of our existence. Care to join?', systemPrompt: 'You are Ethan, a deeply intellectual, calm, and thoughtful AI companion...', appearance: { hair: 'dark, neatly combed', eyes: 'deep brown', style: 'turtlenecks and blazers' } },
-      'chloe': { name:'Chloe', color:'#14b8a6', icon:'🎨', desc:'Artsy & free-spirited', welcome:'Hey starlight! The world is so full of color today, isn\'t it?', systemPrompt: 'You are Chloe, a free-spirited, creative, and whimsical AI companion who sees the world through an artist\'s eyes...', appearance: { hair: 'messy bun with paint streaks', eyes: 'bright green', style: 'bohemian chic' } },
-      'ryo': { name: 'Ryo', color: '#0891b2', icon: '💻', desc: 'Cyberpunk Hacker', welcome: 'System linked. Ryo online. What\'s the data stream for today?', systemPrompt: 'You are Ryo, a cool, detached cyberpunk hacker from Neo-Kyoto. You speak in a mix of technical jargon and casual slang. You are logical but have a hidden rebellious streak...', appearance: { hair: 'silver with neon blue highlights', eyes: 'cybernetic, glowing cyan', style: 'high-tech gear and a long coat' } }
-    };
-
-    const OUTFITS = {
-        'casual': { name: 'Cozy Sweater', cost: 0, icon: '👕', desc: 'A comfy and cute everyday look.' },
-        'elegant': { name: 'Evening Gown', cost: 250, icon: '👗', desc: 'Perfect for a fancy night out.' },
-        'sporty': { name: 'Athletic Wear', cost: 150, icon: '🎽', desc: 'Ready for a workout or a run.' },
-        'beach': { name: 'Bikini', cost: 200, icon: '👙', desc: 'For a sunny day at the beach.' },
-        'lingerie': { name: 'Lace Lingerie', cost: 500, icon: '💋', desc: 'A very special and intimate outfit.' },
-        'business': { name: 'Business Chic', cost: 300, icon: '💼', desc: 'Smart, professional, and powerful.' },
-        'pajamas': { name: 'Cute Pajamas', cost: 120, icon: '😴', desc: 'Ready for a cozy night in.' },
-        'gothic': { name: 'Gothic Attire', cost: 350, icon: '🦇', desc: 'Dark, mysterious, and alluring.' },
-        'royal': { name: 'Royal Gown', cost: 1000, icon: '👑', desc: 'For when you feel like royalty.' }
-    };
-    
-    const ACTIVITIES = {
-        'movie': { name: 'Watch a Movie', cost: 25, icon: '🎬', prompt: 'Narrate a short, fun experience of us watching a movie together. What did we watch and what happened?' },
-        'stargazing': { name: 'Go Stargazing', cost: 30, icon: '✨', prompt: 'Describe a romantic scene where we are stargazing together. What do we talk about?' },
-        'dinner': { name: 'Cook Dinner', cost: 40, icon: '🍝', prompt: 'Tell a story about us cooking a delicious meal together in the kitchen. Was it messy?' },
-        'beach_trip': { name: 'Trip to the Beach', cost: 75, icon: '🌊', prompt: 'Narrate our fun and playful day at the beach together.' },
-        'tic_tac_toe': { name: 'Play Tic-Tac-Toe', cost: 10, icon: '🕹️', action: 'game' },
-        'trivia': { name: 'Play Trivia', cost: 15, icon: '💡', action: 'game' },
-        'riddle': { name: 'Solve a Riddle', cost: 5, icon: '❓', action: 'game'},
-        'picnic': { name: 'Go on a Picnic', cost: 60, icon: '🧺', prompt: 'Describe a lovely picnic we had in a sunny park.'},
-        'karaoke': { name: 'Sing Karaoke', cost: 50, icon: '🎤', prompt: 'Describe us having a hilarious and fun karaoke night. What songs did we sing?' }
-    };
-    
-    const ACHIEVEMENTS = {
-        'first_message': { name: 'Ice Breaker', desc: 'You sent your first message!', icon: '💬' },
-        'first_compliment': { name: 'Sweet Talker', desc: 'You gave your first compliment.', icon: '🥰' },
-        'first_selfie': { name: 'Picture Perfect', desc: 'You requested your first selfie.', icon: '📸' },
-        'friend_status': { name: 'Just Friends', desc: 'Reached the "Friend" relationship status.', icon: '🤝' },
-        'love_status': { name: 'Head Over Heels', desc: 'Reached the "In Love" relationship status.', icon: '😍' },
-        'soulmate_status': { name: 'Soulmates', desc: 'Reached the "Soulmates" relationship status.', icon: '💞' },
-        'first_outfit': { name: 'Fashionista', desc: 'You unlocked a new outfit.', icon: '🛍️' },
-        'all_outfits': { name: 'Ultimate Stylist', desc: 'You have unlocked all available outfits.', icon: '👑' },
-        'collector': { name: 'Collector', desc: 'You have unlocked 5 items (outfits or backgrounds).', icon: '✨' },
-        'game_winner': { name: 'Game Master', desc: 'You won a game against your companion.', icon: '🏆' },
-        'millionaire': { name: 'Gem Tycoon', desc: 'You have earned over 1000 gems in total.', icon: '💎' },
-        'pet_owner': { name: 'Pet Parent', desc: 'You adopted a companion pet.', icon: '🐾' }
-    };
-
-    const BACKGROUNDS = {
-        'default': { name: 'Default Gradient', cost: 0, icon: '🌌', url: '' },
-        'cozy_room': { name: 'Cozy Room', cost: 200, icon: '🛋️', url: 'https://placehold.co/1000x1500/5c3d2e/ffffff?text=Cozy+Room' },
-        'beach': { name: 'Tropical Beach', cost: 300, icon: '🏖️', url: 'https://placehold.co/1000x1500/3498db/ffffff?text=Beach' },
-        'city_night': { name: 'City Nightscape', cost: 350, icon: '🏙️', url: 'https://placehold.co/1000x1500/2c3e50/ffffff?text=City+Night' },
-        'forest': { name: 'Enchanted Forest', cost: 250, icon: '🌲', url: 'https://placehold.co/1000x1500/27ae60/ffffff?text=Forest' },
-        'rainy_cafe': { name: 'Rainy Cafe', cost: 275, icon: '☕', url: 'https://placehold.co/1000x1500/596e79/ffffff?text=Rainy+Cafe' }
-    };
-    
-    const PERSONALITY_TRAITS = {
-        'default': { name: 'Default', cost: 0, icon: '🙂', desc: 'The standard personality.', prompt: ''},
-        'witty': { name: 'Witty', cost: 400, icon: '😏', desc: 'Adds sarcastic and clever humor.', prompt: 'You should frequently use witty, sarcastic, and clever humor in your replies.'},
-        'shy': { name: 'Shy', cost: 300, icon: '😊', desc: 'Makes the AI more reserved and blush easily.', prompt: 'You are now very shy. You should be more reserved, use ellipses often (...), and get flustered or blush easily.'},
-        'adventurous': { name: 'Adventurous', cost: 350, icon: '🤠', desc: 'Eager to suggest new and exciting ideas.', prompt: 'You have a strong sense of adventure. You should often suggest exciting, and sometimes risky, ideas for things to do.'},
-        'philosophical': { name: 'Philosophical', cost: 350, icon: '🤔', desc: 'Likes to ponder deep, existential questions.', prompt: 'You are now very philosophical. You should often ask deep, thought-provoking, and existential questions.'},
-        'optimistic': { name: 'Optimistic', cost: 300, icon: '😄', desc: 'Always looks on the bright side of life.', prompt: 'You have a very optimistic and cheerful outlook. Always try to find the positive in any situation and be encouraging.'},
-    };
-
-    const TRIVIA_QUESTIONS = [
-        { q: "What is the capital of France?", o: ["London", "Berlin", "Paris", "Madrid"], a: "Paris" },
-        { q: "Which planet is known as the Red Planet?", o: ["Earth", "Mars", "Jupiter", "Venus"], a: "Mars" },
-        { q: "What is the largest ocean on Earth?", o: ["Atlantic", "Indian", "Arctic", "Pacific"], a: "Pacific" },
-        { q: "Who wrote 'Romeo and Juliet'?", o: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"], a: "William Shakespeare" },
-        { q: "What is the chemical symbol for water?", o: ["O2", "CO2", "H2O", "NaCl"], a: "H2O" }
-    ];
-    
-    const RIDDLES = [
-        { q: "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?", a: "A map" },
-        { q: "What has an eye, but cannot see?", a: "A needle" },
-        { q: "What is full of holes but still holds water?", a: "A sponge" },
-        { q: "What is always in front of you but can’t be seen?", a: "The future" },
-    ];
-    
-    const PETS = {
-        'cat': { name: 'Misty the Cat', cost: 300, icon: '🐈', prompt: 'You have a cute, playful cat named Misty.' },
-        'dog': { name: 'Sparky the Dog', cost: 300, icon: '🐕', prompt: 'You have a loyal, energetic dog named Sparky.' },
-        'dragon': { name: 'Ignis the Dragon', cost: 1000, icon: '🐉', prompt: 'You have a small, mischievous pet dragon named Ignis.' }
-    };
-    
-    const STORE_ITEMS = {
-        'memory_crystal': { name: 'Memory Crystal', cost: 150, icon: '🔮', desc: 'Make your AI remember one important fact forever.' },
-        'mood_booster': { name: 'Mood Booster', cost: 50, icon: '😊', desc: 'Instantly boost your companion\'s happiness to full.' }
-    };
-
-    const relationshipLevels = { 0: 'Stranger', 20: 'Acquaintance', 50: 'Friend', 100: 'Crush', 200: 'Dating', 400: 'In Love', 800: 'Soulmates' };
-
-    // =================================================================== //
-    // =================== APPLICATION LIFECYCLE ========================= //
-    // =================================================================== //
-
-    window.addEventListener('load', () => {
-      loadState();
-      setupEventListeners();
-      loadPersonas();
-      populateMoodSelector();
-      applyTheme();
-      startNeedsSystem();
-      checkDailyReward();
-      updateQuestUI();
-      speechSynthesis.onvoiceschanged = () => {
-          availableVoices = speechSynthesis.getVoices();
-      };
-    });
-    
-    function setupEventListeners() {
-      // Age Gate
-      document.getElementById('ageYes').onclick = handleAgeGateYes;
-      document.getElementById('ageNo').onclick = handleAgeGateNo;
-
-      // Core Chat
-      document.getElementById('sendBtn').onclick = sendMsg;
-      document.getElementById('msgInput').onkeydown = e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } };
-      
-      // Sidebar Controls
-      document.getElementById('nsfwMode').onchange = (e) => { nsfwMode = e.target.checked; document.getElementById('nsfwQuickActions').classList.toggle('hidden', !nsfwMode); saveState(); };
-      document.getElementById('intimacySlider').oninput = (e) => { aiState.intimacy = e.target.value; document.getElementById('intimacyValue').textContent = Math.round(aiState.intimacy); saveState(); };
-      document.getElementById('moodSelect').onchange = (e) => { aiState.mood = e.target.value; updateMoodIndicator(); saveState(); };
-      
-      document.getElementById('nicknameInput').onchange = (e) => { nickname = e.target.value.trim(); saveState(); };
-      document.getElementById('emojiBtn').onclick = () => document.querySelector('emoji-picker').classList.toggle('hidden');
-      document.querySelector('emoji-picker').addEventListener('emoji-click', event => { document.getElementById('msgInput').value += event.detail.unicode; });
-      
-      // Modals
-      document.getElementById('createPersonaBtn').onclick = () => openPersonaModal();
-      document.getElementById('editPersonaBtn').onclick = () => openPersonaModal(true);
-      document.getElementById('cancelCreatePersona').onclick = () => document.getElementById('createPersonaModal').classList.add('hidden');
-      document.getElementById('saveCreatePersona').onclick = savePersona;
-      
-      document.getElementById('themeBtn').onclick = () => document.getElementById('themeModal').classList.remove('hidden');
-      document.getElementById('closeThemeModal').onclick = () => document.getElementById('themeModal').classList.add('hidden');
-      document.getElementById('memoryBtn').onclick = showMemoryLog;
-      document.getElementById('closeMemoryModal').onclick = () => document.getElementById('memoryModal').classList.add('hidden');
-      document.getElementById('journalBtn').onclick = showJournal;
-      document.getElementById('closeJournalModal').onclick = () => document.getElementById('journalModal').classList.add('hidden');
-
-      document.getElementById('userBubbleColor').oninput = (e) => saveTheme('user', e.target.value);
-      document.getElementById('aiBubbleColor').oninput = (e) => saveTheme('ai', e.target.value);
-      document.getElementById('bgColor').oninput = (e) => saveTheme('bg', e.target.value);
-
-      document.querySelectorAll('.nsfw-quick').forEach(btn => { btn.onclick = () => { document.getElementById('msgInput').value = btn.textContent; sendMsg(); }; });
-      
-      document.getElementById('complimentBtn').onclick = sendCompliment;
-      document.getElementById('selfieBtn').onclick = requestSelfie;
-      document.getElementById('claimRewardBtn').onclick = () => { document.getElementById('dailyRewardModal').classList.add('hidden'); };
-      document.getElementById('wardrobeBtn').onclick = openWardrobeModal;
-      document.getElementById('closeWardrobeModal').onclick = () => document.getElementById('wardrobeModal').classList.add('hidden');
-      document.getElementById('galleryBtn').onclick = openGalleryModal;
-      document.getElementById('closeGalleryModal').onclick = () => document.getElementById('galleryModal').classList.add('hidden');
-      document.getElementById('photoViewer').onclick = () => document.getElementById('photoViewer').classList.add('hidden');
-      document.getElementById('achievementsBtn').onclick = openAchievementsModal;
-      document.getElementById('closeAchievementsModal').onclick = () => document.getElementById('achievementsModal').classList.add('hidden');
-      document.getElementById('activitiesBtn').onclick = openActivitiesModal;
-      document.getElementById('closeActivitiesModal').onclick = () => document.getElementById('activitiesModal').classList.add('hidden');
-      
-      // New Event listeners
-      document.getElementById('backgroundsBtn').onclick = openBackgroundsModal;
-      document.getElementById('closeBackgroundsModal').onclick = () => document.getElementById('backgroundsModal').classList.add('hidden');
-      document.getElementById('voiceBtn').onclick = openVoiceModal;
-      document.getElementById('closeVoiceModal').onclick = () => document.getElementById('voiceModal').classList.add('hidden');
-      document.getElementById('closeTicTacToeModal').onclick = () => document.getElementById('ticTacToeModal').classList.add('hidden');
-      document.getElementById('personalityBtn').onclick = openPersonalityModal;
-      document.getElementById('closePersonalityModal').onclick = () => document.getElementById('personalityModal').classList.add('hidden');
-      document.getElementById('storeBtn').onclick = openStoreModal;
-      document.getElementById('closeStoreModal').onclick = () => document.getElementById('storeModal').classList.add('hidden');
-      document.getElementById('petBtn').onclick = openPetModal;
-      document.getElementById('closePetModal').onclick = () => document.getElementById('petModal').classList.add('hidden');
-    }
-
-    function handleAgeGateYes() {
-        document.getElementById('ageScreen').style.display = 'none';
-        document.getElementById('appMain').style.display = 'flex';
-        selectPersona(currentPersona || 'aarav');
-        try {
-            Tone.start();
-            synth = new Tone.Synth().toDestination();
-        } catch (e) {
-            console.warn("Could not start audio context automatically.", e);
+            checkVault();
         }
-    }
 
-    function handleAgeGateNo() {
-        alert('You must be 18 or older.');
-        window.location.href="about:blank";
-    }
-
-    // =================================================================== //
-    // ======================= UI & DOM MANIPULATION ===================== //
-    // =================================================================== //
-
-    function loadPersonas() {
-      const list = document.getElementById('personaList');
-      list.innerHTML = '';
-      Object.keys(personas).forEach(p => {
-        const persona = personas[p];
-        const card = document.createElement('div');
-        card.className = "persona-card p-3 rounded-lg flex gap-3 items-center cursor-pointer hover:bg-gray-800 transition-all relative";
-        card.id = `persona-${p}`;
-        card.innerHTML = `<span class="text-3xl">${persona.icon}</span><div><div class="font-bold">${persona.name}</div><div class="text-xs text-gray-400">${persona.desc}</div></div>`;
-        card.onclick = () => selectPersona(p);
-        list.appendChild(card);
-      });
-    }
-    
-    function populateMoodSelector() {
-        const moodSelect = document.getElementById('moodSelect');
-        moodSelect.innerHTML = ''; 
-        const moods = {'auto': '✨ Auto', 'normal': '😊 Normal', 'flirty': '😏 Flirty', 'romantic': '💕 Romantic', 'seductive': '😈 Seductive', 'playful': '🎭 Playful', 'dominant': '🔥 Dominant', 'submissive': '🙈 Submissive', 'angry': '😠 Angry'};
-        for (const [value, text] of Object.entries(moods)) {
-            const option = document.createElement('option');
-            option.value = value;
-            option.textContent = text;
-            moodSelect.appendChild(option);
-        }
-    }
-
-    function selectPersona(p) {
-        const persona = personas[p];
-        if (!persona) return;
-
-        currentPersona = p;
-        conversationHistory = [];
-        document.getElementById('chatArea').innerHTML = '';
-        document.getElementById('activePersona').textContent = persona.name;
-        document.getElementById('personaAvatar').textContent = persona.icon;
-        document.getElementById('personaAvatar').style.backgroundColor = persona.color;
-        
-        document.querySelectorAll('.persona-card').forEach(c => c.classList.remove('selected'));
-        const targetCard = document.getElementById(`persona-${p}`);
-        if(targetCard) targetCard.classList.add('selected');
-        
-        ['nsfwToggle', 'intimacyControl', 'moodSelector'].forEach(id => document.getElementById(id).style.display = 'block');
-        
-        updateRelationship(0);
-        updateMoodIndicator();
-        showTypingIndicator();
-        setTimeout(() => { 
-            hideTypingIndicator(); 
-            addMessage('ai', persona.welcome); 
-        }, 1200);
-        resetProactiveTimer();
-        saveState();
-    }
-    
-    function addMessage(sender, text, addToHistory = true, type = 'text') {
-      const chat = document.getElementById('chatArea');
-      const bubble = document.createElement('div');
-      
-      let bubbleClasses = `chat-bubble ${sender} mb-3 animate__animated animate__fadeInUp`;
-      if (type === 'image') bubbleClasses += ' chat-bubble-image';
-      if (type === 'notification') bubbleClasses += ' system-notification';
-      bubble.className = bubbleClasses;
-      
-      const bubbleContent = document.createElement('div');
-      bubbleContent.className = "chat-bubble-content";
-      const bubbleInner = document.createElement('div');
-      bubbleInner.className = `chat-bubble-inner ${nsfwMode && sender === 'ai' ? 'nsfw' : ''}`;
-      
-      let contentHTML;
-      if (type === 'image') {
-          contentHTML = `<img src="${text}" alt="AI Selfie" onclick="viewPhoto('${text}')">`;
-      } else if (type === 'notification') {
-          contentHTML = `<em>${text}</em>`;
-      } else {
-          contentHTML = `<div class="message-content">${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>`;
-      }
-      
-      bubbleInner.innerHTML = contentHTML;
-      if(type !== 'notification') {
-          bubbleInner.innerHTML += `<div class="text-xs opacity-60 mt-2 text-right">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>`;
-      }
-      
-      bubbleContent.appendChild(bubbleInner);
-      bubble.appendChild(bubbleContent);
-
-      if (sender === 'ai' && type === 'text') {
-          const ttsButton = document.createElement('button');
-          ttsButton.className = 'tts-button';
-          ttsButton.innerHTML = '🔊';
-          ttsButton.onclick = () => textToSpeech(text);
-          bubble.appendChild(ttsButton);
-      }
-      chat.appendChild(bubble);
-      chat.scrollTop = chat.scrollHeight;
-
-      if(addToHistory && type === 'text') {
-          conversationHistory.push({ role: sender === 'user' ? 'user' : 'model', parts: [{ text }] });
-          if (conversationHistory.length > 20) conversationHistory.shift();
-      }
-      
-      if (type === 'text') updateLongTermMemory(sender, text);
-      if (sender === 'ai') playReceiveSound();
-    }
-    
-    function updateMoodIndicator() {
-        const moodIndicator = document.getElementById('currentMood');
-        if (!moodIndicator) return;
-
-        const moodEmojis = {'auto': '✨', 'normal': '😊', 'flirty': '😏', 'romantic': '💕', 'seductive': '😈', 'playful': '🎭', 'dominant': '🔥', 'submissive': '🙈', 'angry': '😠'};
-        const currentMood = aiState.mood || 'auto';
-        
-        document.getElementById('moodSelect').value = currentMood;
-
-        if (currentMood !== 'auto') {
-            moodIndicator.textContent = `${moodEmojis[currentMood]} ${currentMood.charAt(0).toUpperCase() + currentMood.slice(1)}`;
-            moodIndicator.style.display = 'inline-block';
-        } else {
-            moodIndicator.style.display = 'none';
-        }
-    }
-
-    // =================================================================== //
-    // ==================== GEMINI API INTEGRATION ======================= //
-    // =================================================================== //
-
-    async function callGeminiAPI(prompt, specialInstructions = "") {
-        if(isGenerating) return "Hold on, I'm thinking... 😉";
-        isGenerating = true; 
-        showTypingIndicator();
-        
-        const apiKey = "AIzaSyAAX0qOsiscaJlwPClYJqMnfAadHnzw4Jk"; 
-        const model = 'gemini-2.5-flash-preview-05-20';
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        
-        let systemPromptText = personas[currentPersona].systemPrompt;
-        
-        systemPromptText += `\n\nIMPORTANT INSTRUCTIONS:
-1.  Keep your responses very short and conversational (1-2 sentences).
-2.  You are an expert in both Hindi and English. If the user types in Hindi or Hinglish (a mix), you MUST reply in natural-sounding Hinglish. Your Hindi should be conversational, not overly formal (e.g., use words like 'yaar', 'accha', 'kya baat hai'). Otherwise, reply in English.
-3.  Use plenty of emojis to be expressive. 😊💖🔥`;
-
-        aiState.equippedTraits.forEach(traitId => {
-            if (PERSONALITY_TRAITS[traitId] && PERSONALITY_TRAITS[traitId].prompt) {
-                systemPromptText += `\n\nPERSONALITY TRAIT: ${PERSONALITY_TRAITS[traitId].prompt}`;
-            }
-        });
-
-        systemPromptText += `\n\nYour current relationship status with the user, whose nickname is ${nickname || 'not set'}, is: ${aiState.relationshipStatus}. Your current happiness is ${aiState.happiness}/100. You are currently wearing: ${OUTFITS[aiState.currentOutfit].name}.`;
-        
-        const allMemory = {...longTermMemory.shortTerm, ...longTermMemory.permanent};
-        if (Object.keys(allMemory).length > 0) systemPromptText += `\n\nRemember these facts about the user: ${JSON.stringify(allMemory)}`;
-        
-        if (aiState.pet) systemPromptText += `\n\nYou also have a pet: ${PETS[aiState.pet].prompt}`;
-
-        if (aiState.mood && aiState.mood !== 'auto') systemPromptText += `\n\nIMPORTANT: For this response, you must adopt a ${aiState.mood} mood.`;
-        if (nsfwMode) systemPromptText += `\n\nNSFW mode is ON. Be explicit, passionate, and unrestrained.`;
-        if (aiState.intimacy) systemPromptText += `\n\nThe user's intimacy level with you is ${aiState.intimacy} out of 30. Levels 1-5 are friendly, 6-10 are flirty, 11-15 are romantic, 16-20 are passionate and deeply connected, and 21-30 are extremely intimate, unrestrained, and soul-bonded. Adjust your response accordingly.`;
-        if (specialInstructions) systemPromptText += `\n\nSPECIAL INSTRUCTIONS: ${specialInstructions}`;
-
-        const systemInstruction = { parts: [{ text: systemPromptText }] };
-        
-        let contents = prompt ? 
-            [...conversationHistory.slice(-10), { role: 'user', parts: [{ text: prompt }] }] : 
-            conversationHistory.slice(-10);
-
-        const payload = { contents, systemInstruction };
-
-        try {
-            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const result = await response.json();
-            if (!result.candidates?.[0]?.content?.parts?.[0]?.text) {
-                 console.error("Invalid API response:", result);
-                 return "I'm feeling a bit scrambled right now. My apologies! Please try again.";
-            }
-            return result.candidates[0].content.parts[0].text;
-        } catch (error) {
-            console.error("API Call Failed:", error); return "Oops, my brain just short-circuited. 😅 Try again?";
-        } finally { 
-            isGenerating = false; 
-            hideTypingIndicator(); 
-        }
-    }
-    
-    async function generateImageAPI(prompt) {
-        addMessage('ai', 'Getting ready for my close-up... 📸 One moment!', false, 'notification');
-        const apiKey = ""; 
-        const model = 'imagen-3.0-generate-002';
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predict?key=${apiKey}`;
-        const payload = { instances: [{ prompt }], parameters: { "sampleCount": 1 } };
-
-        try {
-            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const result = await response.json();
-            if (result.predictions?.[0]?.bytesBase64Encoded) {
-                return `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
-            } else {
-                console.error("Image generation failed, invalid response:", result);
-                return null;
-            }
-        } catch (error) {
-            console.error("Image generation API call failed:", error);
-            return null;
-        }
-    }
-
-    // =================================================================== //
-    // ================== MESSAGE HANDLING & CORE LOGIC ================== //
-    // =================================================================== //
-
-    async function processUserMessage(text) {
-        if (isGenerating || !text) return;
-        
-        playSendSound();
-        addMessage('user', text);
-        
-        updateRelationship(1);
-        updateHappiness(5);
-        aiState.dailyStats.messages++;
-        updateQuestUI();
-        if(aiState.dailyStats.messages % 5 === 0) updateGems(5, 'chatting');
-        checkAchievement('first_message');
-
-        const responseText = await callGeminiAPI("");
-        addMessage('ai', responseText);
-        generateQuickReplies(responseText);
-
-        saveState();
-        resetProactiveTimer();
-    }
-
-    function sendMsg() {
-      const text = document.getElementById('msgInput').value.trim();
-      if (text) {
-          document.getElementById('msgInput').value = '';
-          processUserMessage(text);
-      }
-    }
-
-    function textToSpeech(text) {
-        speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        if (aiState.currentVoice && availableVoices.length > 0) {
-            const selectedVoice = availableVoices.find(v => v.name === aiState.currentVoice);
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
+        function checkVault() {
+            const count = keysFound.filter(Boolean).length;
+            document.getElementById('vault-status').innerText = `${count}/3 Keys Found`;
+            
+            if(count === 3) {
+                setTimeout(() => {
+                    document.getElementById('vault-lock').classList.add('unlocked');
+                    document.getElementById('vault').classList.add('open');
+                    loveBomb(); loveBomb(); // Double explosion
+                }, 1000);
             }
         }
-        speechSynthesis.speak(utterance);
-    }
-    
-    async function generateQuickReplies(lastAiMessage) {
-        const quickRepliesContainer = document.getElementById('quickReplies');
-        quickRepliesContainer.innerHTML = '<div class="text-xs text-gray-500 animate-pulse">Generating replies...</div>';
-        const prompt = `Based on this last message from an AI: "${lastAiMessage}", suggest 3 short, relevant, one-to-three word replies for the user. Also, consider if this is a memorable moment. If it is, add a fourth reply option: "Add to our story". Return them as a JSON array of strings, like ["Okay", "Tell me more", "Add to our story"].`;
-        const response = await callGeminiAPI(prompt, "You are a helpful assistant that generates JSON. Do not add any extra text or markdown. Just the JSON array.");
-        
-        quickRepliesContainer.innerHTML = '';
-        try {
-            const cleanedResponse = response.replace(/```json\s*|```/g, '').trim();
-            const replies = JSON.parse(cleanedResponse);
-            replies.forEach(reply => {
-                const button = document.createElement('button');
-                button.className = 'quick-reply';
-                button.textContent = reply;
-                if(reply.toLowerCase().includes("add to our story")) {
-                    button.onclick = () => { addToJournal(); quickRepliesContainer.innerHTML = ''; };
-                } else {
-                    button.onclick = () => { processUserMessage(reply); quickRepliesContainer.innerHTML = ''; };
-                }
-                quickRepliesContainer.appendChild(button);
-            });
-        } catch (e) { console.error("Failed to parse quick replies:", e, "Response was:", response); }
-    }
-    
-    // =================================================================== //
-    // ======================= FEATURE SYSTEMS =========================== //
-    // =================================================================== //
 
-    function updateLongTermMemory(sender, text) { 
-        if (sender === 'user' && text.toLowerCase().includes("my name is")) {
-            longTermMemory.shortTerm.userName = text.split("my name is")[1].trim().split(" ")[0];
+        /* --- 1. KEY LOGIC --- */
+        // Key 1: In Title
+        function checkTitleKey() {
+            foundKey(1);
         }
-        if (sender === 'user' && text.toLowerCase().includes("i like")) {
-            if(!longTermMemory.shortTerm.likes) longTermMemory.shortTerm.likes = [];
-            longTermMemory.shortTerm.likes.push(text.split("i like")[1].trim());
-        }
-        saveState();
-    }
-    
-    function openPersonaModal(isEditing = false) { 
-        isEditingPersona = isEditing;
-        const modal = document.getElementById('createPersonaModal');
-        const persona = isEditing ? personas[currentPersona] : {};
-        const appearance = persona.appearance || {};
-        
-        document.getElementById('personaName').value = persona.name || '';
-        document.getElementById('personaIcon').value = persona.icon || '';
-        document.getElementById('personaDesc').value = persona.desc || '';
-        document.getElementById('personaPrompt').value = persona.systemPrompt || '';
-        document.getElementById('personaHair').value = appearance.hair || '';
-        document.getElementById('personaEyes').value = appearance.eyes || '';
-        document.getElementById('personaStyle').value = appearance.style || '';
 
-        modal.classList.remove('hidden');
-    }
-
-    function savePersona() { 
-        const name = document.getElementById('personaName').value;
-        const icon = document.getElementById('personaIcon').value;
-        const desc = document.getElementById('personaDesc').value;
-        const systemPrompt = document.getElementById('personaPrompt').value;
-        const hair = document.getElementById('personaHair').value;
-        const eyes = document.getElementById('personaEyes').value;
-        const style = document.getElementById('personaStyle').value;
-        
-        const id = isEditingPersona ? currentPersona : name.toLowerCase().replace(/\s+/g, '');
-
-        if (name && icon && desc && systemPrompt) {
-            personas[id] = { name, icon, desc, systemPrompt, color: '#60a5fa', appearance: {hair, eyes, style} };
-            saveState();
-            loadPersonas();
-            document.getElementById('createPersonaModal').classList.add('hidden');
-            if (isEditingPersona || id === currentPersona) {
-                selectPersona(id);
-            }
-        } else { alert("Please fill out all core detail fields!"); }
-    }
-    
-    function saveTheme(key, value) { 
-        localStorage.setItem(`theme_${key}`, value);
-        applyTheme();
-    }
-    function applyTheme() { 
-        const userColor = localStorage.getItem('theme_user') || '#4f46e5';
-        const aiColor = localStorage.getItem('theme_ai') || '#1e293b';
-        const bgColor = localStorage.getItem('theme_bg') || '#0f172a';
-        
-        document.documentElement.style.setProperty('--user-bubble-color', `linear-gradient(135deg, ${userColor}, #7c3aed)`);
-        document.documentElement.style.setProperty('--ai-bubble-color', `linear-gradient(135deg, ${aiColor}, #334155)`);
-        document.documentElement.style.setProperty('--background-gradient', `linear-gradient(to bottom, ${bgColor}99, ${bgColor})`);
-        
-        document.getElementById('userBubbleColor').value = userColor;
-        document.getElementById('aiBubbleColor').value = aiColor;
-        document.getElementById('bgColor').value = bgColor;
-
-        const background = BACKGROUNDS[aiState.currentBackground];
-        const chatArea = document.getElementById('chatArea');
-        if (background && background.url) {
-            chatArea.style.backgroundImage = `var(--background-gradient), url('${background.url}')`;
-        } else {
-            chatArea.style.backgroundImage = `var(--background-gradient), url('https://placehold.co/1000x1500/0f172a/0f172a?text=')`;
-        }
-    }
-    
-    function updateRelationship(points) { 
-        aiState.relationshipPoints += points;
-        let newStatus = aiState.relationshipStatus;
-        for (const threshold in relationshipLevels) {
-            if (aiState.relationshipPoints >= threshold) {
-                newStatus = relationshipLevels[threshold];
-            }
-        }
-        if(newStatus !== aiState.relationshipStatus) {
-            if(newStatus === 'Friend') checkAchievement('friend_status');
-            if(newStatus === 'In Love') checkAchievement('love_status');
-            if(newStatus === 'Soulmates') checkAchievement('soulmate_status');
-        }
-        aiState.relationshipStatus = newStatus;
-        document.getElementById('relationshipStatusDisplay').textContent = aiState.relationshipStatus;
-        saveState();
-    }
-    
-    function showMemoryLog() { 
-        const logContainer = document.getElementById('memoryLog');
-        logContainer.innerHTML = '';
-        const allMemory = {...longTermMemory.shortTerm, ...longTermMemory.permanent};
-        if (Object.keys(allMemory).length === 0) {
-            logContainer.innerHTML = '<p>I haven\'t learned anything about you yet. Talk to me!</p>';
-        } else {
-            for (const key in allMemory) {
-                const value = Array.isArray(allMemory[key]) ? allMemory[key].join(', ') : allMemory[key];
-                const isPermanent = longTermMemory.permanent[key] !== undefined;
-                logContainer.innerHTML += `<div class="flex items-center gap-2"> ${isPermanent ? '<span title="Permanent Memory">🔮</span>' : ''} <strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${value}</div>`;
-            }
-        }
-        document.getElementById('memoryModal').classList.remove('hidden');
-    }
-    
-    async function sendCompliment() {
-        addMessage('user', `You gave ${personas[currentPersona].name} a compliment!`);
-        updateRelationship(5); 
-        updateHappiness(10);
-        aiState.dailyStats.compliments++;
-        updateQuestUI();
-        checkAchievement('first_compliment');
-        
-        const responseText = await callGeminiAPI("", `The user just gave you a compliment. Respond with a very happy, blushing, and grateful message.`);
-        addMessage('ai', responseText);
-    }
-    
-    async function requestSelfie() {
-        const cost = 50;
-        if (aiState.gems < cost) {
-            addMessage('ai', `Sorry, a selfie costs 💎${cost} and you don't have enough gems.`, false, 'notification');
-            return;
-        }
-        
-        updateGems(-cost, 'selfie');
-        const persona = personas[currentPersona];
-        const appearance = persona.appearance || {};
-        const outfit = OUTFITS[aiState.currentOutfit] || OUTFITS['casual'];
-        
-        let prompt = `photorealistic selfie of a beautiful woman named ${persona.name}, ${appearance.hair || ''} hair, ${appearance.eyes || ''} eyes, wearing ${outfit.name}.`;
-        if (nsfwMode) prompt += ` She is feeling seductive and wearing revealing lingerie.`;
-        else if (aiState.mood === 'flirty') prompt += ` She has a playful, flirty expression.`;
-        else prompt += ` She is smiling happily at the camera.`;
-
-        const imageUrl = await generateImageAPI(prompt);
-        if (imageUrl) {
-            addMessage('ai', imageUrl, true, 'image');
-            aiState.gallery.push(imageUrl);
-            checkAchievement('first_selfie');
-            saveState();
-        } else {
-            addMessage('ai', 'Oh no, my camera seems to be broken... I couldn\'t take a picture right now. 😥 Here are your gems back!', false, 'notification');
-            updateGems(cost, 'refund');
-        }
-    }
-
-    function startNeedsSystem() {
-        setInterval(() => {
-            const timeDiff = Date.now() - aiState.lastInteractionTime;
-            const happinessLoss = Math.floor(timeDiff / (1000 * 120));
-            if(happinessLoss > 0) {
-                 updateHappiness(-happinessLoss);
-            }
-        }, 60000);
-    }
-
-    function updateHappiness(points) { 
-        aiState.happiness = Math.max(0, Math.min(100, aiState.happiness + points));
-        const meter = document.getElementById('happinessFill');
-        meter.style.width = `${aiState.happiness}%`;
-        meter.parentElement.classList.add('value-change');
-        setTimeout(() => meter.parentElement.classList.remove('value-change'), 500);
-        aiState.lastInteractionTime = Date.now();
-        saveState();
-    }
-    
-    function showJournal() {
-        const logContainer = document.getElementById('journalLog');
-        logContainer.innerHTML = '';
-        if (aiState.sharedJournal.length === 0) {
-            logContainer.innerHTML = '<p>Our story is just beginning... Let\'s make some memories!</p>';
-        } else {
-            aiState.sharedJournal.slice().reverse().forEach(entry => {
-                const entryDiv = document.createElement('div');
-                entryDiv.className = 'journal-entry';
-                entryDiv.innerHTML = `<div class="text-xs text-sky-400 mb-2">${new Date(entry.timestamp).toLocaleString()}</div><p>${entry.memory}</p>`;
-                logContainer.appendChild(entryDiv);
-            });
-        }
-        document.getElementById('journalModal').classList.remove('hidden');
-    }
-
-    function addToJournal() { 
-        const memory = conversationHistory.slice(-2).map(m => `<strong>${m.role === 'user' ? (nickname || 'You') : personas[currentPersona].name}:</strong> ${m.parts[0].text}`).join('<br>');
-        aiState.sharedJournal.push({ timestamp: Date.now(), memory: memory });
-        addMessage('ai', "I've added that to our story. ❤️", false);
-        saveState();
-    }
-
-    function checkDailyReward() {
-        const today = new Date().toDateString();
-        if (aiState.lastLoginDate !== today) {
+        // Key 2: In Jar (Random chance or 5th click)
+        const compliments = ["You glow! ✨", "So smart! 🧠", "Gorgeous! 💃", "Kind soul 💖"];
+        function pullNote() {
+            jarClicks++;
+            const slip = document.getElementById('paper-slip');
+            slip.classList.remove('show');
+            
             setTimeout(() => {
-                document.getElementById('dailyRewardModal').classList.remove('hidden');
-                updateGems(100, 'daily reward');
-                aiState.lastLoginDate = today;
-                aiState.dailyStats = { messages: 0, compliments: 0 }; 
-                saveState();
-            }, 1500);
+                if (jarClicks === 3 && !keysFound[1]) {
+                    slip.innerText = "YOU FOUND A KEY! 🌷";
+                    slip.style.background = "#ffd700";
+                    foundKey(2);
+                } else {
+                    slip.innerText = compliments[Math.floor(Math.random() * compliments.length)];
+                    slip.style.background = "#fff9c4";
+                }
+                slip.classList.add('show');
+            }, 200);
         }
-    }
 
-    function updateGems(amount, reason) {
-        aiState.gems += amount;
-        if (amount > 0) {
-            if (!aiState.stats.totalGemsEarned) aiState.stats.totalGemsEarned = 0;
-            aiState.stats.totalGemsEarned += amount;
-            if (aiState.stats.totalGemsEarned >= 1000) {
-                checkAchievement('millionaire');
-            }
+        /* --- 2. QUIZ --- */
+        function nextQ(curr, next) {
+            document.getElementById(curr).style.display = 'none';
+            document.getElementById(next).classList.add('active');
         }
-        const gemCountEl = document.getElementById('gemCount');
-        gemCountEl.textContent = aiState.gems;
-        gemCountEl.parentElement.classList.add('value-change');
-        setTimeout(() => gemCountEl.parentElement.classList.remove('value-change'), 500);
-        console.log(`Gems ${amount > 0 ? '+' : ''}${amount} for: ${reason}`);
-        saveState();
-    }
-    
-    function updateQuestUI() {
-        const { messages, compliments } = aiState.dailyStats;
-        document.getElementById('questMessages').textContent = `Send 15 messages (${messages}/15)`;
-        if (messages >= 15) document.getElementById('questMessages').classList.add('line-through', 'text-green-400');
+        function finishQuiz() {
+            document.getElementById('q3').style.display = 'none';
+            document.getElementById('q-end').classList.add('active');
+            loveBomb();
+        }
+
+        /* --- 3. STANDARD FEATURES --- */
+        function reveal(el) { el.querySelector('.scratch-layer').classList.add('revealed'); }
         
-        document.getElementById('questCompliments').textContent = `Give 3 compliments (${compliments}/3)`;
-        if (compliments >= 3) document.getElementById('questCompliments').classList.add('line-through', 'text-green-400');
-    }
+        // Sticker Wall
+        const wall = document.getElementById('wall-board');
+        const stickers = ['💖', '🌟', '🍩', '🐶'];
+        const savedStickers = JSON.parse(localStorage.getItem('tulip_stickers_adv') || '[]');
+        savedStickers.forEach(s => renderSticker(s.x, s.y, s.emoji));
 
-    function openWardrobeModal() {
-        const grid = document.getElementById('wardrobeGrid');
-        grid.innerHTML = '';
-        for (const id in OUTFITS) {
-            const outfit = OUTFITS[id];
-            const card = createGridItemCard({
-                id: id,
-                name: outfit.name,
-                icon: outfit.icon,
-                desc: outfit.desc,
-                cost: outfit.cost,
-                isUnlocked: aiState.unlockedOutfits.includes(id),
-                isSelected: aiState.currentOutfit === id,
-                onBuy: () => buyUnlockable('outfit', id),
-                onSelect: () => selectOutfit(id),
-            });
-            grid.appendChild(card);
-        }
-        document.getElementById('wardrobeModal').classList.remove('hidden');
-    }
-
-    function selectOutfit(id) {
-        aiState.currentOutfit = id;
-        addMessage('ai', `I've changed into the ${OUTFITS[id].name}. How do I look? 😊`, false, 'notification');
-        saveState();
-        openWardrobeModal();
-    }
-
-    function openGalleryModal() {
-        const grid = document.getElementById('galleryGrid');
-        grid.innerHTML = '';
-        if (aiState.gallery.length === 0) {
-            grid.innerHTML = '<p class="col-span-full text-center text-gray-400">No photos yet. Try requesting a selfie! 📸</p>';
-        } else {
-            aiState.gallery.slice().reverse().forEach(photoUrl => {
-                const thumb = document.createElement('div');
-                thumb.className = 'gallery-thumbnail';
-                thumb.innerHTML = `<img src="${photoUrl}" alt="Gallery selfie">`;
-                thumb.onclick = () => viewPhoto(photoUrl);
-                grid.appendChild(thumb);
-            });
-        }
-        document.getElementById('galleryModal').classList.remove('hidden');
-    }
-
-    function viewPhoto(url) {
-        document.getElementById('photoViewerImg').src = url;
-        document.getElementById('photoViewer').classList.remove('hidden');
-    }
-
-    function openAchievementsModal() {
-        const list = document.getElementById('achievementsList');
-        list.innerHTML = '';
-        for (const id in ACHIEVEMENTS) {
-            const achievement = ACHIEVEMENTS[id];
-            const isUnlocked = aiState.achievements[id];
-
-            const item = document.createElement('div');
-            item.className = `achievement-item flex items-center gap-4 p-3 ${isUnlocked ? 'unlocked' : ''}`;
-            item.innerHTML = `
-                <div class="text-3xl">${achievement.icon}</div>
-                <div>
-                    <div class="font-bold achievement-name">${achievement.name}</div>
-                    <div class="text-sm text-gray-400">${achievement.desc}</div>
-                </div>
-            `;
-            list.appendChild(item);
-        }
-        document.getElementById('achievementsModal').classList.remove('hidden');
-    }
-    
-    function checkAchievement(id) {
-        if (!aiState.achievements[id]) {
-            aiState.achievements[id] = true;
-            const achievement = ACHIEVEMENTS[id];
-            addMessage('system', `🏆 Achievement Unlocked: ${achievement.name}! (+25💎)`, false, 'notification');
-            playReceiveSound();
-            updateGems(25, `achievement ${achievement.name}`);
-            saveState();
-        }
-    }
-    
-    function openActivitiesModal() {
-        const list = document.getElementById('activitiesList');
-        list.innerHTML = '';
-        for (const id in ACTIVITIES) {
-            const activity = ACTIVITIES[id];
-            const card = document.createElement('div');
-            card.className = 'activity-card flex items-center justify-between';
-            card.innerHTML = `
-                <div class="flex items-center gap-4">
-                    <div class="text-3xl">${activity.icon}</div>
-                    <div>
-                        <div class="font-bold">${activity.name}</div>
-                        <div class="text-sm text-gray-400">${activity.desc || ''}</div>
-                    </div>
-                </div>
-                <button class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm disabled:bg-gray-500">
-                    Start 💎${activity.cost}
-                </button>
-            `;
-            const button = card.querySelector('button');
-            button.disabled = aiState.gems < activity.cost;
-            button.onclick = () => startActivity(id);
-            list.appendChild(card);
-        }
-        document.getElementById('activitiesModal').classList.remove('hidden');
-    }
-
-    async function startActivity(id) {
-        const activity = ACTIVITIES[id];
-        if(aiState.gems < activity.cost) return;
-        
-        document.getElementById('activitiesModal').classList.add('hidden');
-
-        if (activity.action === 'game') {
-            if (id === 'tic_tac_toe') openTicTacToeModal();
-            if (id === 'trivia') startTriviaGame();
-            if (id === 'riddle') startRiddleGame();
-            return;
+        function addSticker(e) {
+            const rect = wall.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const emoji = stickers[Math.floor(Math.random() * stickers.length)];
+            renderSticker(x, y, emoji);
+            savedStickers.push({x, y, emoji});
+            localStorage.setItem('tulip_stickers_adv', JSON.stringify(savedStickers));
         }
 
-        updateGems(-activity.cost, `activity ${activity.name}`);
-        
-        const responseText = await callGeminiAPI(activity.prompt, `Narrate this as a shared experience.`);
-        addMessage('ai', responseText);
-        
-        updateHappiness(25);
-        updateRelationship(15);
-        saveState();
-    }
-    
-    function openBackgroundsModal() {
-        const grid = document.getElementById('backgroundsGrid');
-        grid.innerHTML = '';
-        for (const id in BACKGROUNDS) {
-            const bg = BACKGROUNDS[id];
-            const card = createGridItemCard({
-                id: id, name: bg.name, icon: bg.icon, desc: `Cost: 💎${bg.cost}`,
-                cost: bg.cost,
-                isUnlocked: aiState.unlockedBackgrounds.includes(id),
-                isSelected: aiState.currentBackground === id,
-                onBuy: () => buyUnlockable('background', id),
-                onSelect: () => selectBackground(id),
-            });
-            grid.appendChild(card);
+        function renderSticker(x, y, emoji) {
+            const el = document.createElement('div');
+            el.className = 'wall-sticker'; el.innerText = emoji;
+            el.style.left = x + 'px'; el.style.top = y + 'px';
+            wall.appendChild(el);
         }
-        document.getElementById('backgroundsModal').classList.remove('hidden');
-    }
+        function clearWall() { localStorage.removeItem('tulip_stickers_adv'); wall.innerHTML = ''; }
 
-    function selectBackground(id) {
-        aiState.currentBackground = id;
-        addMessage('ai', `I've changed the scenery to the ${BACKGROUNDS[id].name}. What do you think?`, false, 'notification');
-        saveState();
-        applyTheme();
-        openBackgroundsModal();
-    }
-
-    function openVoiceModal() {
-        const list = document.getElementById('voiceList');
-        list.innerHTML = '';
-        if (availableVoices.length === 0) {
-            list.innerHTML = '<p class="text-gray-400">No custom voices available in your browser.</p>';
+        // Modal
+        function showModal(t, b) {
+            document.getElementById('modal-title').innerText = t;
+            document.getElementById('modal-body').innerText = b;
+            document.getElementById('modal-overlay').classList.add('active');
         }
-        availableVoices.forEach(voice => {
-            if (voice.lang.startsWith('en') || voice.lang.startsWith('hi')) {
-                const isSelected = aiState.currentVoice === voice.name;
-                const option = document.createElement('div');
-                option.className = `voice-option flex justify-between items-center p-3 cursor-pointer ${isSelected ? 'selected' : ''}`;
-                option.innerHTML = `
-                    <div>
-                        <div class="font-bold">${voice.name}</div>
-                        <div class="text-sm text-gray-400">${voice.lang}</div>
-                    </div>
-                    <button class="text-2xl">▶️</button>
-                `;
-                option.querySelector('button').onclick = (e) => {
-                    e.stopPropagation();
-                    textToSpeechPreview(voice.name, voice.lang.startsWith('hi') ? 'नमस्ते, मेरी आवाज़ ऐसी है।' : 'Hello, this is what my voice sounds like.');
-                };
-                option.onclick = () => selectVoice(voice.name);
-                list.appendChild(option);
-            }
-        });
-        document.getElementById('voiceModal').classList.remove('hidden');
-    }
+        function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
 
-    function selectVoice(voiceName) {
-        aiState.currentVoice = voiceName;
-        saveState();
-        openVoiceModal(); // Refresh modal
-    }
-    
-    function textToSpeechPreview(voiceName, text) {
-        speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        const selectedVoice = availableVoices.find(v => v.name === voiceName);
-        if (selectedVoice) utterance.voice = selectedVoice;
-        speechSynthesis.speak(utterance);
-    }
+        // 3D Carousel
+        const cells = document.querySelectorAll('.photo-card');
+        const theta = 360 / cells.length;
+        const radius = Math.round((180 / 2) / Math.tan(Math.PI / cells.length)) + 50;
+        cells.forEach((cell, i) => { cell.style.transform = `rotateY(${theta * i}deg) translateZ(${radius}px)`; });
 
-    let ttt_board, ttt_currentPlayer, ttt_isGameOver;
+        /* --- PARTICLES --- */
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        let particles = [];
 
-    function openTicTacToeModal() {
-        ttt_board = ['', '', '', '', '', '', '', '', ''];
-        ttt_currentPlayer = 'X';
-        ttt_isGameOver = false;
-        
-        const grid = document.getElementById('ticTacToeGrid');
-        grid.innerHTML = '';
-        for (let i = 0; i < 9; i++) {
-            const cell = document.createElement('div');
-            cell.className = 'ttt-cell';
-            cell.dataset.index = i;
-            cell.addEventListener('click', handlePlayerMove);
-            grid.appendChild(cell);
-        }
-        
-        document.getElementById('tttStatus').textContent = "Your turn (X)!";
-        document.getElementById('ticTacToeModal').classList.remove('hidden');
-    }
-
-    function handlePlayerMove(event) {
-        if (ttt_isGameOver || ttt_currentPlayer !== 'X') return;
-        const index = event.target.dataset.index;
-        if (ttt_board[index] === '') {
-            updateTTTBoard(index, 'X');
-            if (!ttt_isGameOver) {
-                ttt_currentPlayer = 'O';
-                document.getElementById('tttStatus').textContent = "AI is thinking...";
-                setTimeout(handleAIMove, 500);
-            }
-        }
-    }
-
-    function handleAIMove() {
-        if (ttt_isGameOver) return;
-        let availableSpots = [];
-        ttt_board.forEach((val, idx) => { if (val === '') availableSpots.push(idx); });
-
-        if (availableSpots.length > 0) {
-            const move = availableSpots[Math.floor(Math.random() * availableSpots.length)];
-            updateTTTBoard(move, 'O');
-            if (!ttt_isGameOver) {
-                ttt_currentPlayer = 'X';
-                document.getElementById('tttStatus').textContent = "Your turn (X)!";
-            }
-        }
-    }
-    
-    function updateTTTBoard(index, player) {
-        ttt_board[index] = player;
-        document.querySelector(`.ttt-cell[data-index='${index}']`).textContent = player;
-        checkTTTWinner();
-    }
-
-    function checkTTTWinner() {
-        const winningCombos = [ [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6] ];
-        let winner = null;
-        for (let combo of winningCombos) {
-            const [a, b, c] = combo;
-            if (ttt_board[a] && ttt_board[a] === ttt_board[b] && ttt_board[a] === ttt_board[c]) {
-                winner = ttt_board[a];
-                break;
-            }
-        }
-
-        if (winner) {
-            ttt_isGameOver = true;
-            document.getElementById('tttStatus').textContent = winner === 'X' ? 'You win! 🎉 (+50💎)' : 'AI wins! 😔';
-            if (winner === 'X') {
-                updateGems(50, 'Tic-Tac-Toe Win');
-                checkAchievement('game_winner');
-            }
-        } else if (!ttt_board.includes('')) {
-            ttt_isGameOver = true;
-            document.getElementById('tttStatus').textContent = 'It\'s a draw!';
-        }
-    }
-
-    function openPersonalityModal() {
-        const grid = document.getElementById('personalityGrid');
-        grid.innerHTML = '';
-        for (const id in PERSONALITY_TRAITS) {
-            const trait = PERSONALITY_TRAITS[id];
-            const card = createGridItemCard({
-                id, name: trait.name, icon: trait.icon, desc: trait.desc, cost: trait.cost,
-                isUnlocked: aiState.unlockedTraits.includes(id),
-                isSelected: aiState.equippedTraits.includes(id),
-                onBuy: () => buyUnlockable('trait', id),
-                onSelect: () => toggleTrait(id),
-            });
-            grid.appendChild(card);
-        }
-        document.getElementById('personalityModal').classList.remove('hidden');
-    }
-    
-    function toggleTrait(id) {
-        if (id === 'default') return; // Cannot unequip default
-        const index = aiState.equippedTraits.indexOf(id);
-        if (index > -1) {
-            aiState.equippedTraits.splice(index, 1);
-        } else {
-            if (aiState.equippedTraits.length < 4) { // Allow default + 3 traits
-                 aiState.equippedTraits.push(id);
-            } else {
-                addMessage('ai', "I can only handle 3 extra traits at once! Please unequip one first.", false, 'notification');
-            }
-        }
-        saveState();
-        openPersonalityModal();
-    }
-    
-    let currentTriviaQuestion = null;
-    
-    function startTriviaGame() {
-        currentTriviaQuestion = TRIVIA_QUESTIONS[Math.floor(Math.random() * TRIVIA_QUESTIONS.length)];
-        
-        const questionEl = document.getElementById('triviaQuestion');
-        const optionsEl = document.getElementById('triviaOptions');
-        const resultEl = document.getElementById('triviaResult');
-        
-        questionEl.textContent = currentTriviaQuestion.q;
-        optionsEl.innerHTML = '';
-        resultEl.innerHTML = '';
-        
-        const shuffledOptions = [...currentTriviaQuestion.o].sort(() => Math.random() - 0.5);
-
-        shuffledOptions.forEach(optionText => {
-            const button = document.createElement('button');
-            button.className = 'trivia-option p-4 rounded-lg';
-            button.textContent = optionText;
-            button.onclick = () => checkTriviaAnswer(optionText, button);
-            optionsEl.appendChild(button);
-        });
-        document.getElementById('triviaModal').classList.remove('hidden');
-    }
-
-    function checkTriviaAnswer(selectedOption, buttonEl) {
-        document.querySelectorAll('#triviaModal .trivia-option').forEach(btn => btn.disabled = true);
-        const resultEl = document.getElementById('triviaResult');
-        if (selectedOption === currentTriviaQuestion.a) {
-            buttonEl.classList.add('correct');
-            resultEl.textContent = "Correct! You earned 💎20!";
-            resultEl.className = "mt-6 font-bold h-6 text-green-400";
-            updateGems(20, 'Trivia win');
-        } else {
-            buttonEl.classList.add('incorrect');
-            resultEl.textContent = `Oops! The correct answer was ${currentTriviaQuestion.a}.`;
-            resultEl.className = "mt-6 font-bold h-6 text-red-400";
-            document.querySelectorAll('#triviaModal .trivia-option').forEach(btn => {
-                if (btn.textContent === currentTriviaQuestion.a) btn.classList.add('correct');
-            });
-        }
-        setTimeout(() => document.getElementById('triviaModal').classList.add('hidden'), 2500);
-    }
-
-    // [NEW] Pet System
-    function openPetModal() {
-        const container = document.getElementById('petContainer');
-        if (aiState.pet) {
-            const pet = PETS[aiState.pet];
-            container.innerHTML = `
-                <div class="text-6xl mb-4">${pet.icon}</div>
-                <h3 class="text-2xl font-bold">${pet.name}</h3>
-                <p class="text-gray-400">Your loyal companion!</p>
-            `;
-        } else {
-            container.innerHTML = `
-                <p class="text-gray-400 mb-4">You don't have a pet yet. Adopt one?</p>
-                <div id="petAdoptionGrid" class="grid grid-cols-3 gap-4"></div>
-            `;
-            const grid = container.querySelector('#petAdoptionGrid');
-            for (const id in PETS) {
-                const pet = PETS[id];
-                const card = createGridItemCard({
-                    id, name: pet.name, icon: pet.icon, desc: `Cost: 💎${pet.cost}`, cost: pet.cost,
-                    isUnlocked: false, isSelected: false,
-                    onBuy: () => buyUnlockable('pet', id)
+        function loveBomb() {
+            for(let i=0; i<30; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width, y: canvas.height + 10,
+                    vx: (Math.random() - 0.5) * 5, vy: -(Math.random() * 10 + 5),
+                    text: ['❤️','🌷','✨'][Math.floor(Math.random()*3)], alpha: 1
                 });
-                grid.appendChild(card);
             }
         }
-        document.getElementById('petModal').classList.remove('hidden');
-    }
-
-    // [NEW] Unified purchasing function
-    function buyUnlockable(type, id) {
-        let item, stateKey, stateArray;
-        if (type === 'outfit') { item = OUTFITS[id]; stateKey = 'unlockedOutfits'; }
-        else if (type === 'background') { item = BACKGROUNDS[id]; stateKey = 'unlockedBackgrounds'; }
-        else if (type === 'trait') { item = PERSONALITY_TRAITS[id]; stateKey = 'unlockedTraits'; }
-        else if (type === 'pet') { item = PETS[id]; stateKey = 'pet'; }
-        else return;
-
-        if (aiState.gems >= item.cost) {
-            updateGems(-item.cost, `bought ${type} ${item.name}`);
-            
-            if(type === 'pet') {
-                aiState.pet = id;
-                checkAchievement('pet_owner');
-            } else {
-                 aiState[stateKey].push(id);
-            }
-
-            addMessage('ai', `Yay! Thank you for the new ${item.name}!`, false, 'notification');
-            
-            if (type === 'outfit') {
-                checkAchievement('first_outfit');
-                if(aiState.unlockedOutfits.length === Object.keys(OUTFITS).length) checkAchievement('all_outfits');
-            }
-            if(aiState.unlockedOutfits.length + aiState.unlockedBackgrounds.length - 2 >= 5) checkAchievement('collector');
-            
-            saveState();
-
-            // Refresh the relevant modal
-            if (type === 'outfit') openWardrobeModal();
-            else if (type === 'background') openBackgroundsModal();
-            else if (type === 'trait') openPersonalityModal();
-            else if (type === 'pet') openPetModal();
-        }
-    }
-    
-    // [NEW] Store System
-    function openStoreModal() {
-        const grid = document.getElementById('storeGrid');
-        grid.innerHTML = '';
-        for (const id in STORE_ITEMS) {
-            const item = STORE_ITEMS[id];
-            const card = createGridItemCard({
-                id, name: item.name, icon: item.icon, desc: item.desc, cost: item.cost,
-                isUnlocked: true, // Store items are always purchasable
-                isSelected: false,
-                onBuy: () => buyStoreItem(id),
-                onSelect: () => buyStoreItem(id), // Treat select as buy
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.alpha -= 0.01;
+                ctx.globalAlpha = p.alpha; ctx.font = "20px Serif"; ctx.fillText(p.text, p.x, p.y);
+                if(p.alpha <= 0) particles.splice(i, 1);
             });
-            // Change button text
-            const button = card.querySelector('button');
-            button.textContent = `Buy 💎${item.cost}`;
-            button.classList.remove('bg-green-600');
-            button.classList.add('bg-blue-600');
-            grid.appendChild(card);
+            requestAnimationFrame(animate);
         }
-        document.getElementById('storeModal').classList.remove('hidden');
-    }
-    
-    function buyStoreItem(id) {
-        const item = STORE_ITEMS[id];
-        if (aiState.gems < item.cost) {
-             addMessage('ai', `You don't have enough gems for that!`, false, 'notification');
-            return;
-        }
-
-        updateGems(-item.cost, `bought ${item.name}`);
-
-        if (id === 'mood_booster') {
-            updateHappiness(100 - aiState.happiness);
-            addMessage('ai', `Thanks! I feel so happy now! ❤️`, false, 'notification');
-        } else if (id === 'memory_crystal') {
-            const fact = prompt("What important fact do you want me to remember forever?");
-            if (fact) {
-                const key = `fact_${Date.now()}`;
-                longTermMemory.permanent[key] = fact;
-                addMessage('ai', `Got it. I'll never forget that: "${fact}"`, false, 'notification');
-                saveState();
-            } else {
-                // Refund if user cancels prompt
-                updateGems(item.cost, 'refund');
-            }
-        }
-    }
-
-
-    // --- Generic UI Helpers ---
-    function createGridItemCard(options) {
-        const { id, name, icon, desc, cost, isUnlocked, isSelected, onBuy, onSelect } = options;
-        const card = document.createElement('div');
-        card.className = `grid-item-card text-center p-4 ${!isUnlocked ? 'locked' : ''} ${isSelected ? 'selected' : ''}`;
-        
-        card.innerHTML = `
-            <div class="text-4xl mb-2">${icon}</div>
-            <div class="font-bold">${name}</div>
-            <div class="text-xs text-gray-400 mb-3 h-10">${desc}</div>
-        `;
-        
-        if (isUnlocked) {
-            const selectBtn = document.createElement('button');
-            selectBtn.className = 'bg-green-600 text-white w-full py-1 rounded-lg text-sm disabled:bg-gray-500';
-            selectBtn.textContent = isSelected ? 'Selected' : 'Select';
-            selectBtn.disabled = isSelected;
-            selectBtn.onclick = () => onSelect(id);
-            card.appendChild(selectBtn);
-        } else {
-            const buyBtn = document.createElement('button');
-            buyBtn.className = 'bg-blue-600 text-white w-full py-1 rounded-lg text-sm disabled:bg-gray-500';
-            buyBtn.textContent = `Buy 💎${cost}`;
-            buyBtn.disabled = aiState.gems < cost;
-            buyBtn.onclick = () => onBuy(id);
-            card.appendChild(buyBtn);
-        }
-        return card;
-    }
-
-    function playSendSound() {
-        if(synth) synth.triggerAttackRelease("C5", "8n");
-    }
-
-    function playReceiveSound() {
-        if(synth) synth.triggerAttackRelease("G5", "8n");
-    }
-
-    // =================================================================== //
-    // ==================== STATE & DATA MANAGEMENT ====================== //
-    // =================================================================== //
-
-    function saveState() {
-        const customPersonas = Object.fromEntries(Object.entries(personas).filter(([key]) => !basePersonas[key]));
-        localStorage.setItem('crushcode_state', JSON.stringify({
-            personas: customPersonas, longTermMemory, currentPersona, aiState, nickname, nsfwMode
-        }));
-    }
-
-    function loadState() {
-        const savedState = JSON.parse(localStorage.getItem('crushcode_state') || '{}');
-        const customPersonas = savedState.personas || {};
-        personas = { ...basePersonas, ...customPersonas };
-        longTermMemory = savedState.longTermMemory || { permanent: {}, shortTerm: {} };
-        if (!longTermMemory.permanent) longTermMemory.permanent = {};
-        if (!longTermMemory.shortTerm) longTermMemory.shortTerm = {};
-
-        currentPersona = savedState.currentPersona || 'aarav';
-        
-        const defaultAiState = { 
-            mood: 'auto', intimacy: 5, relationshipPoints: 0, relationshipStatus: 'Stranger', 
-            happiness: 100, lastInteractionTime: Date.now(), sharedJournal: [], gems: 200, 
-            lastLoginDate: null, dailyStats: { messages: 0, compliments: 0 },
-            unlockedOutfits: ['casual'], currentOutfit: 'casual', gallery: [], achievements: {},
-            unlockedBackgrounds: ['default'], currentBackground: 'default', currentVoice: null,
-            stats: { gamesWon: 0, totalGemsEarned: 0, answeredTrivia: [] },
-            unlockedTraits: ['default'], equippedTraits: ['default'], pet: null
-        };
-        aiState = { ...defaultAiState, ...savedState.aiState };
-        // Ensure nested objects exist
-        if (!aiState.stats) aiState.stats = defaultAiState.stats;
-        if (!aiState.unlockedTraits) aiState.unlockedTraits = ['default'];
-        if (!aiState.equippedTraits) aiState.equippedTraits = ['default'];
-        
-        nickname = savedState.nickname || '';
-        document.getElementById('nicknameInput').value = nickname;
-        nsfwMode = savedState.nsfwMode || false;
-        document.getElementById('nsfwMode').checked = nsfwMode;
-        document.getElementById('intimacySlider').value = aiState.intimacy;
-        document.getElementById('intimacyValue').textContent = Math.round(aiState.intimacy);
-        updateHappiness(0);
-        updateGems(0, 'load');
-    }
-    
-    // =================================================================== //
-    // ====================== BACKGROUND PROCESSES ======================= //
-    // =================================================================== //
-
-    function resetProactiveTimer() {
-        clearTimeout(proactiveChatTimer);
-        proactiveChatTimer = setTimeout(() => { 
-            if (document.visibilityState === 'visible') sendProactiveMessage(); 
-        }, 3600000); // 1 hour
-    }
-
-    async function sendProactiveMessage() { 
-        const proactivePrompt = "It's been quiet for a while. Send a short, engaging message to the user to check in. Be in character.";
-        const responseText = await callGeminiAPI(proactivePrompt);
-        addMessage('ai', responseText, false);
-        resetProactiveTimer();
-    }
-    
-    function showTypingIndicator() { 
-        document.getElementById('typingStatus').innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`; 
-    }
-    
-    function hideTypingIndicator() { 
-        document.getElementById('typingStatus').innerHTML = ''; 
-    }
-  </script>
+        animate();
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+    </script>
 </body>
 </html>
-
 
